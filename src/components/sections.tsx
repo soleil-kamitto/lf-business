@@ -21,6 +21,10 @@ import lizaEscribiendo from "@/assets/liza/liza_escribiendo.jpg";
 import lizaExponiendo from "@/assets/liza/liza_exponiendo.jpg";
 import lizaFotografa from "@/assets/liza/liza_fotografa.jpg";
 import videoAi from "@/assets/video-ai.mp4";
+import marcasDoTempoImg from "@/assets/brands/marcas-do-tempo.jpeg";
+import miniMintweltImg from "@/assets/brands/minimintwelt.jpeg";
+import puraVidaImg from "@/assets/brands/pura-vida.jpeg";
+import teufenImg from "@/assets/brands/teufen.jpeg";
 
 const NAV = [
   { label: "Start", to: "/" },
@@ -442,7 +446,7 @@ export function LizaCarousel() {
             animate="center"
             exit="exit"
             transition={{ duration: 1.1, ease: [0.45, 0, 0.25, 1] }}
-            style={{ backfaceVisibility: "hidden", transformStyle: "preserve-3d" }}
+            style={{ backfaceVisibility: "hidden" }}
             className="absolute inset-0 rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/25 bg-card"
           >
             <img src={photo.src} alt={photo.alt} className="w-full h-full object-cover" width={1280} height={1600} />
@@ -1050,6 +1054,26 @@ export function Clientes() {
           Chifa Wong
         </div>
       ),
+    },
+    {
+      key: "minimint",
+      bg: "#f4f4f6",
+      el: <img src={miniMintweltImg} alt="miniMINTwelt" className="w-full h-full object-contain p-4" />,
+    },
+    {
+      key: "marcas",
+      bg: "#c89b6a",
+      el: <img src={marcasDoTempoImg} alt="Marcas do Tempo, Möbel und Dekoration" className="w-full h-full object-cover" />,
+    },
+    {
+      key: "teufen",
+      bg: "#f4f4f6",
+      el: <img src={teufenImg} alt="Coworking Teufen schafft" className="w-full h-full object-contain scale-[1.75] translate-y-3" />,
+    },
+    {
+      key: "puravida",
+      bg: "#ffffff",
+      el: <img src={puraVidaImg} alt="Pura Vida, Deutschkurse" className="w-full h-full object-contain scale-125" />,
     },
   ];
   const row = [...brands, ...brands];

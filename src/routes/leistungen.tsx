@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell, Consultorias, Servicios, KiSoftware, Neuromarketing, Branding, KontaktCTA } from "@/components/sections";
+import { PageShell, Consultorias, Servicios, Neuromarketing, Branding, KontaktCTA } from "@/components/sections";
 
 export const Route = createFileRoute("/leistungen")({
   head: () => ({
@@ -20,7 +20,6 @@ function Leistungen() {
         <Consultorias />
       </div>
       <Servicios />
-      <KiSoftware />
       <Neuromarketing />
       <Branding />
       <KontaktCTA />
