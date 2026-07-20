@@ -14,8 +14,8 @@ import gruenderImg from "@/assets/gruender-desk.jpg";
 import kleinunternehmenImg from "@/assets/kleinunternehmen-tools.jpg";
 import neuroImg from "@/assets/neuro.jpg";
 import servicesImg from "@/assets/services.jpg";
-import logoWhite from "@/assets/logo-white.png";
-import logoIcon from "@/assets/logo-icon.png";
+import logoFullWhite from "@/assets/logo-full-white.png";
+import logoIconColor from "@/assets/logo-icon-color.png";
 import logoIconWhite from "@/assets/logo-icon-white.png";
 import lizaEscribiendo from "@/assets/liza/liza_escribiendo.jpg";
 import videoAi from "@/assets/video-ai.mp4";
@@ -117,7 +117,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className={`flex items-center gap-2 font-display font-bold tracking-tight hover:scale-[1.04] transition-transform ${onDark ? "text-white" : "text-foreground"}`}>
           <span className="relative block w-9 h-9 shrink-0">
-            <img src={logoIcon} alt="LF Business Consulting & Marketing" className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 0 : 1 }} />
+            <img src={logoIconColor} alt="LF Business Consulting & Marketing" className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 0 : 1 }} />
             <img src={logoIconWhite} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 1 : 0 }} />
           </span>
           <span className="text-sm sm:text-base">LF Business Consulting</span>
@@ -1147,7 +1147,7 @@ export function Footer() {
   return (
     <footer className="bg-black text-white/70 py-14 px-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <img src={logoWhite} alt="LF Business Consulting & Marketing" className="h-12 sm:h-14 w-auto logo-on-dark" />
+        <img src={logoFullWhite} alt="LF Business Consulting & Marketing" className="h-12 sm:h-14 w-auto logo-on-dark" />
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} className="hover:text-white transition-colors">
