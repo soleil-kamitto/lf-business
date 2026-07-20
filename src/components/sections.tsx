@@ -10,16 +10,14 @@ import {
   useInView,
   animate,
 } from "framer-motion";
-import madresImg from "@/assets/madres.jpg";
-import pequenosImg from "@/assets/pequenos.jpg";
+import gruenderImg from "@/assets/gruender-desk.jpg";
+import kleinunternehmenImg from "@/assets/kleinunternehmen-tools.jpg";
 import neuroImg from "@/assets/neuro.jpg";
 import servicesImg from "@/assets/services.jpg";
 import logo from "@/assets/logo.png";
 import logoWhite from "@/assets/logo-white.png";
 import logoIcon from "@/assets/logo-icon.png";
 import lizaEscribiendo from "@/assets/liza/liza_escribiendo.jpg";
-import lizaExponiendo from "@/assets/liza/liza_exponiendo.jpg";
-import lizaFotografa from "@/assets/liza/liza_fotografa.jpg";
 import videoAi from "@/assets/video-ai.mp4";
 import marcasDoTempoImg from "@/assets/brands/marcas-do-tempo.jpeg";
 import miniMintweltImg from "@/assets/brands/minimintwelt.jpeg";
@@ -412,80 +410,38 @@ export function Counter({ to, suffix = "", label }: { to: number; suffix?: strin
 }
 
 /* ---------- LIZA FÄSSLER ---------- */
-const LIZA_PHOTOS = [
-  { src: lizaEscribiendo, alt: "Liza Fässler bei der strategischen Planung", tag: "Strategie & Planung" },
-  { src: lizaExponiendo, alt: "Liza Fässler bei einer Präsentation", tag: "Workshops & Beratung" },
-  { src: lizaFotografa, alt: "Liza Fässler mit Kamera", tag: "Kreative Leitung" },
-];
-
-export function LizaCarousel() {
-  const [[idx, dir], setState] = useState<[number, number]>([0, 1]);
-  const go = (next: number, d: number) => setState([(next + LIZA_PHOTOS.length) % LIZA_PHOTOS.length, d]);
-
-  useEffect(() => {
-    const t = setInterval(() => go(idx + 1, 1), 5000);
-    return () => clearInterval(t);
-  }, [idx]);
-
-  const variants = {
-    enter: (d: number) => ({ rotateY: d * 180 }),
-    center: { rotateY: 0 },
-    exit: (d: number) => ({ rotateY: d * -180 }),
-  };
-
-  const photo = LIZA_PHOTOS[idx];
+export function LizaPortrait() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [t, setT] = useState({ rx: 0, ry: 0 });
   return (
     <div className="w-full max-w-sm sm:max-w-md mx-auto">
-      <div className="relative aspect-[4/5]" style={{ perspective: 1600 }}>
-        <AnimatePresence initial={false} custom={dir}>
-          <motion.div
-            key={idx}
-            custom={dir}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 1.1, ease: [0.45, 0, 0.25, 1] }}
-            style={{ backfaceVisibility: "hidden" }}
-            className="absolute inset-0 rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/25 bg-card"
-          >
-            <img src={photo.src} alt={photo.alt} className="w-full h-full object-cover" width={1280} height={1600} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4 rounded-full bg-white/90 backdrop-blur-md px-4 py-2 text-xs font-medium tracking-wide text-foreground shadow-md">
-              {photo.tag}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <div className="mt-6 flex items-center justify-center gap-5">
-        <button
-          aria-label="Vorheriges Foto"
-          onClick={() => go(idx - 1, -1)}
-          className="w-10 h-10 rounded-full border border-border grid place-items-center hover:bg-foreground hover:text-background hover:scale-110 transition-all"
-        >
-          ←
-        </button>
-        <div className="flex gap-2">
-          {LIZA_PHOTOS.map((_, i) => (
-            <button
-              key={i}
-              aria-label={`Foto ${i + 1}`}
-              onClick={() => go(i, i > idx ? 1 : -1)}
-              className={`h-2 rounded-full transition-all duration-400 ${
-                i === idx ? "w-8 bg-amber-warm" : "w-2 bg-border hover:bg-muted-foreground"
-              }`}
-            />
-          ))}
+      <motion.div
+        ref={ref}
+        onMouseMove={(e) => {
+          const r = ref.current!.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          setT({ rx: -y * 6, ry: x * 8 });
+        }}
+        onMouseLeave={() => setT({ rx: 0, ry: 0 })}
+        animate={{ rotateX: t.rx, rotateY: t.ry }}
+        transition={{ type: "spring", stiffness: 150, damping: 18 }}
+        style={{ transformStyle: "preserve-3d", perspective: 1200 }}
+        className="relative aspect-[4/5] rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/25 bg-card group"
+      >
+        <img
+          src={lizaEscribiendo}
+          alt="Liza Fässler bei der strategischen Planung"
+          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-700 ease-out"
+          width={1280}
+          height={1600}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+        <div className="shine-sweep rounded-3xl" />
+        <div className="absolute bottom-4 left-4 rounded-full bg-white/90 backdrop-blur-md px-4 py-2 text-xs font-medium tracking-wide text-foreground shadow-md">
+          Strategie & Planung
         </div>
-        <button
-          aria-label="Nächstes Foto"
-          onClick={() => go(idx + 1, 1)}
-          className="w-10 h-10 rounded-full border border-border grid place-items-center hover:bg-foreground hover:text-background hover:scale-110 transition-all"
-        >
-          →
-        </button>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -565,7 +521,7 @@ export function Liza() {
 
           <div className="lg:col-span-6">
             <Reveal delay={0.2}>
-              <LizaCarousel />
+              <LizaPortrait />
             </Reveal>
           </div>
         </div>
@@ -597,12 +553,12 @@ export function Consultorias() {
     {
       title: "Gründer & Selbstständige",
       phrase: "Ein Unternehmen aufzubauen muss kein einsamer Weg sein. Wir begleiten Sie von der Idee bis zum Wachstum.",
-      img: madresImg,
+      img: gruenderImg,
     },
     {
       title: "Kleine Unternehmen",
       phrase: "Ein erfolgreiches Geschäft entsteht aus Tagen voller Arbeit, Leidenschaft und Hingabe.",
-      img: pequenosImg,
+      img: kleinunternehmenImg,
     },
   ];
   return (
@@ -1058,7 +1014,7 @@ export function Clientes() {
     {
       key: "minimint",
       bg: "#f4f4f6",
-      el: <img src={miniMintweltImg} alt="miniMINTwelt" className="w-full h-full object-contain p-4" />,
+      el: <img src={miniMintweltImg} alt="miniMINTwelt" className="w-full h-full object-cover" />,
     },
     {
       key: "marcas",
@@ -1068,12 +1024,12 @@ export function Clientes() {
     {
       key: "teufen",
       bg: "#f4f4f6",
-      el: <img src={teufenImg} alt="Coworking Teufen schafft" className="w-full h-full object-contain scale-[1.75] translate-y-3" />,
+      el: <img src={teufenImg} alt="Coworking Teufen schafft" className="w-full h-full object-cover" />,
     },
     {
       key: "puravida",
       bg: "#ffffff",
-      el: <img src={puraVidaImg} alt="Pura Vida, Deutschkurse" className="w-full h-full object-contain scale-125" />,
+      el: <img src={puraVidaImg} alt="Pura Vida, Deutschkurse" className="w-full h-full object-cover" />,
     },
   ];
   const row = [...brands, ...brands];
