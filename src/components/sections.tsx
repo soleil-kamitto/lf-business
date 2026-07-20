@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   motion,
@@ -14,9 +14,9 @@ import gruenderImg from "@/assets/gruender-desk.jpg";
 import kleinunternehmenImg from "@/assets/kleinunternehmen-tools.jpg";
 import neuroImg from "@/assets/neuro.jpg";
 import servicesImg from "@/assets/services.jpg";
-import logo from "@/assets/logo.png";
 import logoWhite from "@/assets/logo-white.png";
 import logoIcon from "@/assets/logo-icon.png";
+import logoIconWhite from "@/assets/logo-icon-white.png";
 import lizaEscribiendo from "@/assets/liza/liza_escribiendo.jpg";
 import videoAi from "@/assets/video-ai.mp4";
 import marcasDoTempoImg from "@/assets/brands/marcas-do-tempo.jpeg";
@@ -94,6 +94,8 @@ export function CursorFollower() {
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  const onDark = pathname === "/" && !scrolled;
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -113,9 +115,10 @@ export function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-display font-bold tracking-tight hover:scale-[1.04] transition-transform">
+        <Link to="/" className={`flex items-center gap-2 font-display font-bold tracking-tight hover:scale-[1.04] transition-transform ${onDark ? "text-white" : "text-foreground"}`}>
           <span className="relative block w-9 h-9 shrink-0">
-            <img src={logoIcon} alt="LF Business Consulting & Marketing" className="absolute inset-0 w-full h-full object-contain" />
+            <img src={logoIcon} alt="LF Business Consulting & Marketing" className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 0 : 1 }} />
+            <img src={logoIconWhite} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 1 : 0 }} />
           </span>
           <span className="text-sm sm:text-base">LF Business Consulting</span>
         </Link>
@@ -126,9 +129,9 @@ export function Navbar() {
               key={n.to}
               to={n.to}
               activeOptions={{ exact: n.to === "/" }}
-              activeProps={{ className: "text-foreground font-semibold" }}
-              inactiveProps={{ className: "text-foreground/70" }}
-              className="relative text-sm hover:text-foreground transition-colors group"
+              activeProps={{ className: onDark ? "text-white font-semibold" : "text-foreground font-semibold" }}
+              inactiveProps={{ className: onDark ? "text-white/75" : "text-foreground/70" }}
+              className={`relative text-sm transition-colors group ${onDark ? "hover:text-white" : "hover:text-foreground"}`}
             >
               {n.label}
               <span className="absolute -bottom-1 left-0 h-px w-0 bg-amber-warm group-hover:w-full transition-all duration-300" />
@@ -150,15 +153,15 @@ export function Navbar() {
         >
           <motion.span
             animate={open ? { rotate: 45, y: 0 } : { rotate: 0, y: -6 }}
-            className="absolute h-0.5 w-6 bg-foreground"
+            className={`absolute h-0.5 w-6 transition-colors duration-500 ${onDark ? "bg-white" : "bg-foreground"}`}
           />
           <motion.span
             animate={open ? { opacity: 0 } : { opacity: 1 }}
-            className="absolute h-0.5 w-6 bg-foreground"
+            className={`absolute h-0.5 w-6 transition-colors duration-500 ${onDark ? "bg-white" : "bg-foreground"}`}
           />
           <motion.span
             animate={open ? { rotate: -45, y: 0 } : { rotate: 0, y: 6 }}
-            className="absolute h-0.5 w-6 bg-foreground"
+            className={`absolute h-0.5 w-6 transition-colors duration-500 ${onDark ? "bg-white" : "bg-foreground"}`}
           />
         </button>
       </div>
@@ -228,15 +231,6 @@ export function Hero() {
         className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-24 w-full"
       >
         <div>
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-10"
-          >
-            <img src={logoWhite} alt="LF Business Consulting & Marketing" className="h-14 sm:h-16 lg:h-20 w-auto logo-on-dark" />
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
