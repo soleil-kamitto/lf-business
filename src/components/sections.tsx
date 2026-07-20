@@ -120,7 +120,7 @@ export function Navbar() {
             <img src={logoIconColor} alt="LF Business Consulting & Marketing" className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 0 : 1 }} />
             <img src={logoIconWhite} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain transition-opacity duration-500" style={{ opacity: onDark ? 1 : 0 }} />
           </span>
-          <span className="text-sm sm:text-base">LF Business Consulting</span>
+          <span className="text-sm sm:text-base">Business Consulting & Marketing</span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-7">
