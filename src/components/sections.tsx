@@ -207,8 +207,22 @@ export function Hero() {
     <section
       id="inicio"
       ref={ref}
-      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-cream via-background to-background"
+      className="relative min-h-screen flex items-center overflow-hidden bg-black"
     >
+      <video
+        src={videoAi}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/75" />
+      <div
+        className="absolute inset-0 mix-blend-overlay opacity-60"
+        style={{ background: "radial-gradient(circle at 25% 20%, oklch(0.7 0.17 50 / 0.5), transparent 55%)" }}
+      />
+
       <motion.div
         style={{ opacity }}
         className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-24 w-full"
@@ -220,20 +234,20 @@ export function Hero() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="mb-10"
           >
-            <img src={logo} alt="LF Business Consulting & Marketing" className="h-14 sm:h-16 lg:h-20 w-auto" />
+            <img src={logoWhite} alt="LF Business Consulting & Marketing" className="h-14 sm:h-16 lg:h-20 w-auto logo-on-dark" />
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-card/70 text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/25 bg-white/10 backdrop-blur-md text-xs uppercase tracking-[0.2em] text-white/90 mb-8"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-pulse" />
             Teufen, Schweiz
           </motion.div>
 
-          <h1 className="font-display font-bold leading-[1.05] text-4xl sm:text-6xl lg:text-8xl max-w-5xl">
+          <h1 className="font-display font-bold leading-[1.05] text-4xl sm:text-6xl lg:text-8xl max-w-5xl text-white">
             {words.map((w, i) => (
               <motion.span
                 key={i}
@@ -253,7 +267,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6, duration: 0.6 }}
-            className="mt-8 max-w-xl text-muted-foreground text-lg"
+            className="mt-8 max-w-xl text-white/75 text-lg"
           >
             Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice,
             digitales Marketing, Branding und Neuromarketing, damit sich Ihr Unternehmen wirklich abhebt.
@@ -268,8 +282,8 @@ export function Hero() {
             <MagneticButton href="/kontakt" primary>
               Jetzt starten
             </MagneticButton>
-            <MagneticButton href="/leistungen">Beratung entdecken</MagneticButton>
-            <span className="inline-flex items-center gap-2 text-sm text-muted-foreground self-center">
+            <MagneticButton href="/leistungen" onDark>Beratung entdecken</MagneticButton>
+            <span className="inline-flex items-center gap-2 text-sm text-white/75 self-center">
               <span className="text-amber-warm font-bold">✓</span> Kostenlose Erstberatung
             </span>
           </motion.div>
@@ -280,13 +294,13 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground text-xs uppercase tracking-[0.3em] hidden lg:flex flex-col items-center gap-3"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/60 text-xs uppercase tracking-[0.3em] hidden lg:flex flex-col items-center gap-3"
       >
         Scrollen
         <motion.span
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.6, repeat: Infinity }}
-          className="block w-px h-10 bg-foreground/30"
+          className="block w-px h-10 bg-white/40"
         />
       </motion.div>
     </section>
@@ -297,10 +311,12 @@ export function MagneticButton({
   href,
   children,
   primary,
+  onDark,
 }: {
   href: string;
   children: ReactNode;
   primary?: boolean;
+  onDark?: boolean;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -318,7 +334,9 @@ export function MagneticButton({
       className={`relative inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium overflow-hidden group ${
         primary
           ? "bg-amber-warm text-black shimmer shadow-[0_0_40px_-10px_oklch(0.7_0.17_50)] hover:shadow-[0_0_60px_-5px_oklch(0.7_0.17_50)]"
-          : "border border-foreground/25 text-foreground hover:border-foreground"
+          : onDark
+            ? "border border-white/30 text-white hover:border-white"
+            : "border border-foreground/25 text-foreground hover:border-foreground"
       } transition-shadow`}
     >
       <span className="relative z-10">{children}</span>
