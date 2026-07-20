@@ -951,74 +951,13 @@ export function Branding() {
 export function Clientes() {
   const brands = [
     {
-      key: "liz",
-      bg: "#8a5a33",
-      el: (
-        <div className="text-center">
-          <div className="font-serif font-black text-3xl leading-none tracking-wide" style={{ color: "#160f08" }}>LIZ</div>
-          <div className="text-[9px] font-bold tracking-[0.25em] mt-1" style={{ color: "#241505" }}>MÓVEIS RÚSTICOS</div>
-        </div>
-      ),
-    },
-    {
-      key: "anabe",
-      bg: "#ffffff",
-      el: (
-        <div className="text-center">
-          <div className="font-serif font-bold text-3xl leading-none" style={{ color: "#5c6670" }}>
-            anabe<span style={{ color: "#7fcbbf" }}>.</span>
-          </div>
-          <div className="text-[10px] tracking-wider mt-1" style={{ color: "#8fd0c6" }}>terapias integrativas</div>
-        </div>
-      ),
-    },
-    {
-      key: "catty",
-      bg: "#ffffff",
-      el: (
-        <div className="text-center">
-          <div className="text-xs font-bold tracking-[0.3em]" style={{ color: "#f2a71b" }}>TAMALES</div>
-          <div className="font-serif italic font-bold text-3xl leading-none" style={{ color: "#e2571b" }}>Catty</div>
-        </div>
-      ),
-    },
-    {
-      key: "catlover",
-      bg: "#f7ece4",
-      el: (
-        <div className="text-center">
-          <div className="font-serif italic text-2xl leading-none" style={{ color: "#6b4a2f" }}>cat lover</div>
-          <div className="text-[9px] tracking-[0.3em] mt-1.5" style={{ color: "#6b4a2f" }}>VETERINARIA</div>
-        </div>
-      ),
-    },
-    {
-      key: "planeta",
-      bg: "#1e3a6e",
-      el: (
-        <div className="text-center">
-          <div className="font-display font-bold text-3xl leading-none text-white">Planeta</div>
-          <div className="text-[10px] font-bold tracking-[0.3em] mt-1" style={{ color: "#ff5964" }}>IDIOMAS</div>
-        </div>
-      ),
-    },
-    {
-      key: "chifa",
-      bg: "#d5281f",
-      el: (
-        <div className="font-serif italic font-bold text-2xl leading-tight text-center" style={{ color: "#1c1c1c" }}>
-          Chifa Wong
-        </div>
-      ),
-    },
-    {
       key: "minimint",
       bg: "#f4f4f6",
       el: <img src={miniMintweltImg} alt="miniMINTwelt" className="w-full h-full object-cover" />,
     },
     {
       key: "marcas",
-      bg: "#c89b6a",
+      bg: "#dcae83",
       el: <img src={marcasDoTempoImg} alt="Marcas do Tempo, Möbel und Dekoration" className="w-full h-full object-cover" />,
     },
     {
@@ -1032,7 +971,7 @@ export function Clientes() {
       el: <img src={puraVidaImg} alt="Pura Vida, Deutschkurse" className="w-full h-full object-cover" />,
     },
   ];
-  const row = [...brands, ...brands];
+  const row = [...brands, ...brands, ...brands];
   return (
     <section id="clientes" className="py-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 mb-12">
@@ -1045,8 +984,8 @@ export function Clientes() {
         <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
         <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+          animate={{ x: ["0%", "-33.333%"] }}
+          transition={{ duration: 30, ease: "linear", repeat: Infinity }}
           className="flex gap-6 w-max"
         >
           {row.map((b, i) => (
