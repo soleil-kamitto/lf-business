@@ -411,7 +411,7 @@ export function Counter({ to, suffix = "", label }: { to: number; suffix?: strin
 }
 
 /* ---------- LIZA FÄSSLER ---------- */
-export function LizaPortrait() {
+export function LizaPortrait({ src }: { src?: string | null }) {
   const ref = useRef<HTMLDivElement>(null);
   const [t, setT] = useState({ rx: 0, ry: 0 });
   return (
@@ -431,7 +431,7 @@ export function LizaPortrait() {
         className="relative aspect-[4/5] rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/25 bg-card group"
       >
         <img
-          src={lizaEscribiendo}
+          src={src || lizaEscribiendo}
           alt="Liza Fässler bei der strategischen Planung"
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-700 ease-out"
           width={1280}
@@ -447,7 +447,7 @@ export function LizaPortrait() {
   );
 }
 
-export function Liza({ content }: { content: SiteContent["liza"] }) {
+export function Liza({ content, portraitSrc }: { content: SiteContent["liza"]; portraitSrc?: string | null }) {
   const { expertise, journey } = content;
   return (
     <section id="liza" className="py-32 px-6 bg-secondary/40 overflow-hidden">
@@ -491,7 +491,7 @@ export function Liza({ content }: { content: SiteContent["liza"] }) {
 
           <div className="lg:col-span-6">
             <Reveal delay={0.2}>
-              <LizaPortrait />
+              <LizaPortrait src={portraitSrc} />
             </Reveal>
           </div>
         </div>
@@ -520,8 +520,14 @@ export function Liza({ content }: { content: SiteContent["liza"] }) {
 /* ---------- CONSULTORIAS ---------- */
 const CONSULTORIAS_IMAGES = [gruenderImg, kleinunternehmenImg];
 
-export function Consultorias({ content }: { content: SiteContent["consultorias"] }) {
-  const items = content.map((it, i) => ({ ...it, img: CONSULTORIAS_IMAGES[i] }));
+export function Consultorias({
+  content,
+  images,
+}: {
+  content: SiteContent["consultorias"];
+  images?: (string | null)[];
+}) {
+  const items = content.map((it, i) => ({ ...it, img: images?.[i] || CONSULTORIAS_IMAGES[i] }));
   return (
     <section id="consultorias" className="py-32 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -607,7 +613,7 @@ export function Marquee() {
 }
 
 /* ---------- NEUROMARKETING ---------- */
-export function Neuromarketing() {
+export function Neuromarketing({ image }: { image?: string | null }) {
   const cursos = [
     { t: "Social Media", d: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
     { t: "Design", d: "Gestalten Sie wie eine Fachperson. Nutzen Sie Neuromarketing, das Blicke einfängt und Verkäufe abschliesst." },
@@ -631,7 +637,7 @@ export function Neuromarketing() {
             <Card3D>
               <div className="relative aspect-square rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/10 group">
                 <motion.img
-                  src={neuroImg}
+                  src={image || neuroImg}
                   alt="Neuromarketing"
                   loading="lazy"
                   width={1400}
@@ -742,7 +748,7 @@ export function LeistungenTeaser({ services }: { services: SiteContent["servicio
 }
 
 /* ---------- SERVICIOS (full, leistungen page) ---------- */
-export function Servicios({ content }: { content: SiteContent["servicios"] }) {
+export function Servicios({ content, bannerImage }: { content: SiteContent["servicios"]; bannerImage?: string | null }) {
   return (
     <section id="servicios" className="py-32 px-6 bg-secondary/40">
       <div className="max-w-7xl mx-auto">
@@ -791,7 +797,7 @@ export function Servicios({ content }: { content: SiteContent["servicios"] }) {
 
         <Reveal>
           <div className="relative rounded-3xl overflow-hidden">
-            <img src={servicesImg} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" />
+            <img src={bannerImage || servicesImg} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" />
             <div className="relative min-h-72 bg-gradient-to-r from-black/75 via-black/40 to-transparent flex items-center px-6 sm:px-10 py-10">
               <div className="text-white max-w-xl">
                 <h3 className="text-3xl font-display font-bold mb-3">Bereit zu wachsen?</h3>

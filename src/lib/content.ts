@@ -21,7 +21,17 @@ export type SiteContent = {
   };
   branding: { paragraph: string };
   contact: { address: string; email: string; phone: string };
+  images: {
+    lizaPortrait: string | null;
+    consultoria1: string | null;
+    consultoria2: string | null;
+    neuromarketing: string | null;
+    serviciosBanner: string | null;
+  };
 };
+
+export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "neuromarketing", "serviciosBanner"] as const;
+export type ImageSlot = (typeof IMAGE_SLOTS)[number];
 
 export const defaultContent: SiteContent = {
   hero: {
@@ -112,6 +122,13 @@ export const defaultContent: SiteContent = {
     email: "info@lf-business-consulting.com",
     phone: "+41 77 471 70 06",
   },
+  images: {
+    lizaPortrait: null,
+    consultoria1: null,
+    consultoria2: null,
+    neuromarketing: null,
+    serviciosBanner: null,
+  },
 };
 
 const BLOB_PATHNAME = "site-content.json";
@@ -159,4 +176,25 @@ export const saveContent = createServerFn({ method: "POST" })
       cacheControlMaxAge: 0,
     });
     return { ok: true };
+  });
+
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
+export const uploadImage = createServerFn({ method: "POST" })
+  .validator((data: FormData) => data)
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const file = data.get("file");
+    const slot = data.get("slot");
+    if (!(file instanceof File)) throw new Error("Keine Datei erhalten.");
+    if (typeof slot !== "string" || !slot) throw new Error("Kein Bildplatz angegeben.");
+    if (!file.type.startsWith("image/")) throw new Error("Bitte eine Bilddatei hochladen.");
+    if (file.size > MAX_IMAGE_BYTES) throw new Error("Bild ist zu gross (max. 8 MB).");
+
+    const ext = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
+    const blob = await put(`images/${slot}-${Date.now()}.${ext}`, file, {
+      access: "public",
+      contentType: file.type,
+    });
+    return { url: blob.url };
   });

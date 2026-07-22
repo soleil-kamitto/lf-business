@@ -22,7 +22,7 @@ function UeberUns() {
       <div className="pt-16">
         <About content={content.about} />
       </div>
-      <Liza content={content.liza} />
+      <Liza content={content.liza} portraitSrc={content.images.lizaPortrait} />
       <KontaktCTA />
     </PageShell>
   );

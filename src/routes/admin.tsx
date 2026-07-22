@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { checkAdminAuth, loginAdmin, logoutAdmin } from "@/lib/adminAuth";
-import { getContent, saveContent, type SiteContent } from "@/lib/content";
+import { getContent, saveContent, uploadImage, type SiteContent, type ImageSlot } from "@/lib/content";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -110,6 +110,12 @@ function AdminPage() {
       </Section>
 
       <Section title="Liza Fässler">
+        <ImageField
+          label="Foto von Liza"
+          slot="lizaPortrait"
+          value={content.images.lizaPortrait}
+          onChange={(url) => setContent({ ...content, images: { ...content.images, lizaPortrait: url } })}
+        />
         <Field label="Unterzeile" value={content.liza.subheading} onChange={(v) => setContent({ ...content, liza: { ...content.liza, subheading: v } })} preview="eyebrow" />
         <Field label="Biografie, Absatz 1" value={content.liza.bio1} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio1: v } })} textarea preview="body-light" />
         <Field label="Biografie, Absatz 2" value={content.liza.bio2} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio2: v } })} textarea preview="body-light" />
@@ -172,6 +178,17 @@ function AdminPage() {
       <Section title="Beratung (Consultorias)">
         {content.consultorias.map((c, i) => (
           <div key={i} style={styles.subCard}>
+            <ImageField
+              label={`Bild Karte ${i + 1}`}
+              slot={i === 0 ? "consultoria1" : "consultoria2"}
+              value={i === 0 ? content.images.consultoria1 : content.images.consultoria2}
+              onChange={(url) =>
+                setContent({
+                  ...content,
+                  images: { ...content.images, [i === 0 ? "consultoria1" : "consultoria2"]: url },
+                })
+              }
+            />
             <Field
               label="Titel"
               value={c.title}
@@ -198,6 +215,18 @@ function AdminPage() {
       </Section>
 
       <Section title="Leistungen">
+        <ImageField
+          label="Bild Neuromarketing"
+          slot="neuromarketing"
+          value={content.images.neuromarketing}
+          onChange={(url) => setContent({ ...content, images: { ...content.images, neuromarketing: url } })}
+        />
+        <ImageField
+          label={`Banner-Bild ("Bereit zu wachsen?")`}
+          slot="serviciosBanner"
+          value={content.images.serviciosBanner}
+          onChange={(url) => setContent({ ...content, images: { ...content.images, serviciosBanner: url } })}
+        />
         <Field label="Überschrift" value={content.servicios.heading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, heading: v } })} preview="heading" />
         <Field label="Unterzeile" value={content.servicios.subheading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, subheading: v } })} textarea preview="body-light" />
 
@@ -281,6 +310,78 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 style={styles.h2}>{title}</h2>
       {children}
     </section>
+  );
+}
+
+function ImageField({
+  label,
+  slot,
+  value,
+  onChange,
+}: {
+  label: string;
+  slot: ImageSlot;
+  value: string | null;
+  onChange: (url: string) => void;
+}) {
+  const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    setStatus("uploading");
+    setErrorMsg("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("slot", slot);
+      const res = await uploadImage({ data: formData });
+      onChange(res.url);
+      setStatus("idle");
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+    }
+  }
+
+  return (
+    <div style={{ ...styles.field, marginBottom: "1rem" }}>
+      <span style={styles.label}>{label}</span>
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+        <div
+          style={{
+            width: 96,
+            height: 72,
+            borderRadius: 8,
+            overflow: "hidden",
+            border: "1px solid #ddd8cc",
+            background: "#eee",
+            flexShrink: 0,
+          }}
+        >
+          {value ? (
+            <img src={value} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", fontSize: "0.65rem", color: "#999", textAlign: "center", padding: 4 }}>
+              Standardbild
+            </div>
+          )}
+        </div>
+        <div>
+          <label style={{ ...styles.secondaryButton, display: "inline-block", cursor: "pointer" }}>
+            {status === "uploading" ? "Lädt hoch…" : value ? "Bild ersetzen" : "Bild hochladen"}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFile(e.target.files?.[0])}
+              disabled={status === "uploading"}
+              style={{ display: "none" }}
+            />
+          </label>
+          {errorMsg && <p style={{ ...styles.error, marginTop: "0.4rem" }}>{errorMsg}</p>}
+        </div>
+      </div>
+    </div>
   );
 }
 
