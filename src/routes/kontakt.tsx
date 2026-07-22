@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Contacto } from "@/components/sections";
+import { getContent } from "@/lib/content";
 
 export const Route = createFileRoute("/kontakt")({
+  loader: () => getContent(),
   head: () => ({
     meta: [
       { title: "Kontakt | LF Marketing & Business Consulting" },
@@ -14,9 +16,10 @@ export const Route = createFileRoute("/kontakt")({
 });
 
 function Kontakt() {
+  const content = Route.useLoaderData();
   return (
     <PageShell>
-      <Contacto />
+      <Contacto content={content.contact} />
     </PageShell>
   );
 }

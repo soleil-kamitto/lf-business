@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Hero, Marquee, LeistungenTeaser, Clientes, KontaktCTA } from "@/components/sections";
+import { getContent } from "@/lib/content";
 
 export const Route = createFileRoute("/")({
+  loader: () => getContent(),
   head: () => ({
     meta: [
       { title: "LF Marketing & Business Consulting | Beratung für Unternehmer" },
@@ -15,11 +17,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const content = Route.useLoaderData();
   return (
     <PageShell>
-      <Hero />
+      <Hero content={content.hero} />
       <Marquee />
-      <LeistungenTeaser />
+      <LeistungenTeaser services={content.servicios.services} />
       <Clientes />
       <KontaktCTA />
     </PageShell>

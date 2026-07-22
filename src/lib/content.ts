@@ -1,0 +1,162 @@
+import { createServerFn } from "@tanstack/react-start";
+import { put, list } from "@vercel/blob";
+import { requireAdmin } from "@/lib/adminAuth";
+
+export type SiteContent = {
+  hero: { badge: string; title: string; subtitle: string };
+  about: { paragraph1: string; paragraph2: string };
+  liza: {
+    subheading: string;
+    bio1: string;
+    bio2: string;
+    journey: { year: string; text: string }[];
+    expertise: { title: string; text: string }[];
+  };
+  consultorias: { title: string; phrase: string }[];
+  servicios: {
+    heading: string;
+    subheading: string;
+    services: { title: string; text: string }[];
+    spezial: { title: string; text: string }[];
+  };
+  branding: { paragraph: string };
+  contact: { address: string; email: string; phone: string };
+};
+
+export const defaultContent: SiteContent = {
+  hero: {
+    badge: "Teufen, Schweiz",
+    title: "Gemeinsam stellen wir uns Ihr Unternehmen vor, inspirieren und gestalten es neu",
+    subtitle:
+      "Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice, digitales Marketing, Branding und Neuromarketing, damit sich Ihr Unternehmen wirklich abhebt.",
+  },
+  about: {
+    paragraph1:
+      "Bei LF Marketing & Business Consulting helfen wir bestehenden und zukünftigen Unternehmen, ihren Kundenservice zu verbessern und sich von anderen Anbietern abzuheben.",
+    paragraph2:
+      "Wir verbinden strategische Beratung, digitales Marketing, Branding und Neuromarketing, um Unternehmen mit eigener Identität, menschlichem Fokus und messbaren Ergebnissen aufzubauen.",
+  },
+  liza: {
+    subheading: "Internationale Unternehmerin · Strategin",
+    bio1:
+      "Liza verwandelt seit über zehn Jahren Ideen in Projekte mit Wirkung. Sie arbeitet strategisch zwischen Lateinamerika und Europa und verbindet strategisches Marketing, Geschäftsentwicklung und die Führung komplexer Projekte.",
+    bio2:
+      "Sie führt Unternehmen von der ersten Idee bis zur Skalierung. Ihre Initiativen schaffen heute echten Wert: von innovativen Räumen für gemeinsames Arbeiten bis zu Bildungsplattformen für MINT, die ganze Gemeinschaften erreichen. Ihr Gespür für starke Marken, kluge Verhandlungen und strategische Netzwerke zeichnet sie aus.",
+    journey: [
+      { year: "Brasilien", text: "Leitung kultureller Events und erste unternehmerische Schritte." },
+      { year: "Schweiz", text: "Aufbau der eigenen Praxis als unabhängige Beraterin für Unternehmen und Gründer." },
+      { year: "Heute", text: "Gründerin von miniMINTwelt und strategische Begleiterin für Wachstum und Nachhaltigkeit." },
+    ],
+    expertise: [
+      {
+        title: "Strategie & Transformation",
+        text: "Nachhaltige Geschäftsmodelle für Unternehmer, Startups und KMU. Expertin für Markenpositionierung und klare Differenzierung im Wettbewerb.",
+      },
+      {
+        title: "Projekte mit Wirkung",
+        text: "Führung multidisziplinärer Projekte, von Bildungsinnovation mit miniMINTwelt bis zu kollaborativen Arbeitsräumen wie Coworking Teufen.",
+      },
+      {
+        title: "Strategische Kommunikation",
+        text: "Narrative, die Emotionen mit Resultaten verbinden. Zuhause in lateinamerikanischen und europäischen Märkten.",
+      },
+      {
+        title: "Netzwerke & Allianzen",
+        text: "Aufbau von Ökosystemen der Zusammenarbeit zwischen Bildung, Technologie und Industrie.",
+      },
+    ],
+  },
+  consultorias: [
+    {
+      title: "Gründer & Selbstständige",
+      phrase: "Ein Unternehmen aufzubauen muss kein einsamer Weg sein. Wir begleiten Sie von der Idee bis zum Wachstum.",
+    },
+    {
+      title: "Kleine Unternehmen",
+      phrase: "Ein erfolgreiches Geschäft entsteht aus Tagen voller Arbeit, Leidenschaft und Hingabe.",
+    },
+  ],
+  servicios: {
+    heading: "Alles, was Ihre Marke braucht, an einem Ort.",
+    subheading: "Integrierte Lösungen für Wachstum mit Identität, Klarheit und nachhaltigen Ergebnissen.",
+    services: [
+      { title: "Digitales Marketing", text: "Wirkungsvolle Strategien, um Kunden zu gewinnen und zu überzeugen." },
+      { title: "Design", text: "Visuelle Identität mit Zweck und Emotion." },
+      { title: "Werbung", text: "Kampagnen, die Aufmerksamkeit in Kunden verwandeln." },
+    ],
+    spezial: [
+      {
+        title: "Geschäftsstrategie",
+        text: "Wir analysieren Ihr Geschäft, erkennen Potenziale und zeigen Ihnen, auf welche Produkte Sie sich konzentrieren sollten und wie Sie mehr verkaufen. Vom Handwerksbetrieb bis zum jungen Unternehmen.",
+      },
+      {
+        title: "Kursdesign",
+        text: "Sie sind Experte auf Ihrem Gebiet und möchten Ihr Wissen weitergeben? Wir entwickeln die Strategie und den Aufbau Ihres Kurses, angepasst an Sie und Ihr Publikum.",
+      },
+      {
+        title: "Fundraising",
+        text: "Wir wissen, wie man Projekte überzeugend präsentiert. So gewinnen wir Mittel und Ressourcen für Ihr Vorhaben.",
+      },
+      {
+        title: "Chinesische Medizin",
+        text: "Fundiertes Fachwissen in Traditioneller Chinesischer Medizin. Beratung und Begleitung in diesem besonderen Bereich.",
+      },
+    ],
+  },
+  branding: {
+    paragraph:
+      "Wir betrachten Ihr Unternehmen als Ganzes. Dabei prüfen wir, was Ihre Zielgruppe braucht, welche Trends wichtig sind und wohin Sie sich entwickeln möchten. So stellen wir das passende Paket für Sie zusammen, mit Texten, Bildern und Videos, mit der Planung von Kampagnen und mit der Pflege Ihrer Gemeinschaft in den sozialen Netzwerken.",
+  },
+  contact: {
+    address: "Gfell 1002, 9053 Teufen, Schweiz",
+    email: "info@lf-business-consulting.com",
+    phone: "+41 77 471 70 06",
+  },
+};
+
+const BLOB_PATHNAME = "site-content.json";
+
+function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
+  if (!override) return base;
+  if (Array.isArray(base)) return (override as unknown as T) ?? base;
+  if (typeof base === "object" && base !== null) {
+    const result: any = { ...base };
+    for (const key of Object.keys(override as object)) {
+      const overrideValue = (override as any)[key];
+      if (overrideValue !== undefined) {
+        result[key] = mergeDeep((base as any)[key], overrideValue);
+      }
+    }
+    return result;
+  }
+  return (override as unknown as T) ?? base;
+}
+
+export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<SiteContent> => {
+  try {
+    const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
+    const found = blobs.find((b) => b.pathname === BLOB_PATHNAME);
+    if (!found) return defaultContent;
+    const res = await fetch(found.url, { cache: "no-store" });
+    if (!res.ok) return defaultContent;
+    const stored = (await res.json()) as Partial<SiteContent>;
+    return mergeDeep(defaultContent, stored);
+  } catch (err) {
+    console.error("getContent failed, falling back to defaults", err);
+    return defaultContent;
+  }
+});
+
+export const saveContent = createServerFn({ method: "POST" })
+  .validator((data: SiteContent) => data)
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    await put(BLOB_PATHNAME, JSON.stringify(data, null, 2), {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+      cacheControlMaxAge: 0,
+    });
+    return { ok: true };
+  });

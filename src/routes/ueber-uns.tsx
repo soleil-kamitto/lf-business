@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, About, Liza, KontaktCTA } from "@/components/sections";
+import { getContent } from "@/lib/content";
 
 export const Route = createFileRoute("/ueber-uns")({
+  loader: () => getContent(),
   head: () => ({
     meta: [
       { title: "Über uns & Liza Fässler | LF Marketing & Business Consulting" },
@@ -14,12 +16,13 @@ export const Route = createFileRoute("/ueber-uns")({
 });
 
 function UeberUns() {
+  const content = Route.useLoaderData();
   return (
     <PageShell>
       <div className="pt-16">
-        <About />
+        <About content={content.about} />
       </div>
-      <Liza />
+      <Liza content={content.liza} />
       <KontaktCTA />
     </PageShell>
   );

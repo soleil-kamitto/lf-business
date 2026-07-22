@@ -22,6 +22,7 @@ import marcasDoTempoImg from "@/assets/brands/marcas-do-tempo.jpeg";
 import miniMintweltImg from "@/assets/brands/minimintwelt.jpeg";
 import puraVidaImg from "@/assets/brands/pura-vida.jpeg";
 import teufenImg from "@/assets/brands/teufen.jpeg";
+import type { SiteContent } from "@/lib/content";
 
 const NAV = [
   { label: "Start", to: "/" },
@@ -193,13 +194,12 @@ export function Navbar() {
 }
 
 /* ---------- HERO ---------- */
-export function Hero() {
+export function Hero({ content }: { content: SiteContent["hero"] }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
-  const phrase = "Gemeinsam stellen wir uns Ihr Unternehmen vor, inspirieren und gestalten es neu";
-  const words = phrase.split(" ");
+  const words = content.title.split(" ");
   const highlight = ["vor,", "inspirieren", "gestalten"];
 
   return (
@@ -234,7 +234,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/25 bg-white/10 backdrop-blur-md text-xs uppercase tracking-[0.2em] text-white/90 mb-8"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-pulse" />
-            Teufen, Schweiz
+            {content.badge}
           </motion.div>
 
           <h1 className="font-display font-bold leading-[1.05] text-4xl sm:text-6xl lg:text-8xl max-w-5xl text-white">
@@ -259,8 +259,7 @@ export function Hero() {
             transition={{ delay: 1.6, duration: 0.6 }}
             className="mt-8 max-w-xl text-white/75 text-lg"
           >
-            Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice,
-            digitales Marketing, Branding und Neuromarketing, damit sich Ihr Unternehmen wirklich abhebt.
+            {content.subtitle}
           </motion.p>
 
           <motion.div
@@ -362,7 +361,7 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 }
 
 /* ---------- ABOUT ---------- */
-export function About() {
+export function About({ content }: { content: SiteContent["about"] }) {
   return (
     <section id="about" className="py-32 px-6 bg-background">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
@@ -373,14 +372,8 @@ export function About() {
           </h2>
         </Reveal>
         <Reveal delay={0.15} className="lg:col-span-7 text-muted-foreground text-lg leading-relaxed space-y-5">
-          <p>
-            Bei <strong className="text-foreground">LF Marketing & Business Consulting</strong> helfen wir bestehenden und zukünftigen
-            Unternehmen, ihren Kundenservice zu verbessern und sich von anderen Anbietern abzuheben.
-          </p>
-          <p>
-            Wir verbinden strategische Beratung, digitales Marketing, Branding und Neuromarketing, um Unternehmen
-            mit eigener Identität, menschlichem Fokus und messbaren Ergebnissen aufzubauen.
-          </p>
+          <p>{content.paragraph1}</p>
+          <p>{content.paragraph2}</p>
           <div className="grid grid-cols-3 gap-6 pt-6">
             <Counter to={10} suffix="+" label="Jahre Erfahrung" />
             <Counter to={60} suffix="+" label="Begleitete Marken" />
@@ -454,30 +447,8 @@ export function LizaPortrait() {
   );
 }
 
-export function Liza() {
-  const expertise = [
-    {
-      t: "Strategie & Transformation",
-      d: "Nachhaltige Geschäftsmodelle für Unternehmer, Startups und KMU. Expertin für Markenpositionierung und klare Differenzierung im Wettbewerb.",
-    },
-    {
-      t: "Projekte mit Wirkung",
-      d: "Führung multidisziplinärer Projekte, von Bildungsinnovation mit miniMINTwelt bis zu kollaborativen Arbeitsräumen wie Coworking Teufen.",
-    },
-    {
-      t: "Strategische Kommunikation",
-      d: "Narrative, die Emotionen mit Resultaten verbinden. Zuhause in lateinamerikanischen und europäischen Märkten.",
-    },
-    {
-      t: "Netzwerke & Allianzen",
-      d: "Aufbau von Ökosystemen der Zusammenarbeit zwischen Bildung, Technologie und Industrie.",
-    },
-  ];
-  const journey = [
-    { y: "Brasilien", d: "Leitung kultureller Events und erste unternehmerische Schritte." },
-    { y: "Schweiz", d: "Aufbau der eigenen Praxis als unabhängige Beraterin für Unternehmen und Gründer." },
-    { y: "Heute", d: "Gründerin von miniMINTwelt und strategische Begleiterin für Wachstum und Nachhaltigkeit." },
-  ];
+export function Liza({ content }: { content: SiteContent["liza"] }) {
+  const { expertise, journey } = content;
   return (
     <section id="liza" className="py-32 px-6 bg-secondary/40 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -489,25 +460,16 @@ export function Liza() {
                 Liza <span className="text-gradient-warm">Fässler</span>
               </h2>
               <p className="mt-3 text-sm uppercase tracking-[0.25em] text-muted-foreground">
-                Internationale Unternehmerin · Strategin
+                {content.subheading}
               </p>
             </Reveal>
             <Reveal delay={0.15}>
-              <p className="mt-8 text-muted-foreground text-lg leading-relaxed">
-                Liza verwandelt seit über zehn Jahren Ideen in Projekte mit Wirkung. Sie arbeitet
-                strategisch zwischen Lateinamerika und Europa und verbindet strategisches Marketing,
-                Geschäftsentwicklung und die Führung komplexer Projekte.
-              </p>
-              <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
-                Sie führt Unternehmen von der ersten Idee bis zur Skalierung. Ihre Initiativen schaffen
-                heute echten Wert: von innovativen Räumen für gemeinsames Arbeiten bis zu
-                Bildungsplattformen für MINT, die ganze Gemeinschaften erreichen. Ihr Gespür für starke
-                Marken, kluge Verhandlungen und strategische Netzwerke zeichnet sie aus.
-              </p>
+              <p className="mt-8 text-muted-foreground text-lg leading-relaxed">{content.bio1}</p>
+              <p className="mt-5 text-muted-foreground text-lg leading-relaxed">{content.bio2}</p>
             </Reveal>
             <div className="mt-10 space-y-0">
               {journey.map((j, i) => (
-                <Reveal key={j.y} delay={0.2 + i * 0.12}>
+                <Reveal key={j.year} delay={0.2 + i * 0.12}>
                   <div className="relative pl-8 pb-8 last:pb-0">
                     {i < journey.length - 1 && (
                       <span className="absolute left-[5px] top-4 bottom-0 w-px bg-gradient-to-b from-amber-warm/60 to-border" />
@@ -519,8 +481,8 @@ export function Liza() {
                       transition={{ type: "spring", stiffness: 300, damping: 16, delay: 0.3 + i * 0.12 }}
                       className="absolute left-0 top-1.5 w-[11px] h-[11px] rounded-full bg-amber-warm shadow-[0_0_12px_oklch(0.7_0.17_50/0.6)]"
                     />
-                    <div className="font-display font-bold text-lg">{j.y}</div>
-                    <p className="text-sm text-muted-foreground mt-1">{j.d}</p>
+                    <div className="font-display font-bold text-lg">{j.year}</div>
+                    <p className="text-sm text-muted-foreground mt-1">{j.text}</p>
                   </div>
                 </Reveal>
               ))}
@@ -536,7 +498,7 @@ export function Liza() {
 
         <div className="mt-20 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {expertise.map((e, i) => (
-            <Reveal key={e.t} delay={i * 0.1} className="h-full">
+            <Reveal key={e.title} delay={i * 0.1} className="h-full">
               <motion.div
                 whileHover={{ y: -10, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 200, damping: 18 }}
@@ -544,8 +506,8 @@ export function Liza() {
               >
                 <div className="shine-sweep rounded-2xl" />
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
-                <h3 className="font-display font-semibold text-xl mb-3">{e.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{e.d}</p>
+                <h3 className="font-display font-semibold text-xl mb-3">{e.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{e.text}</p>
               </motion.div>
             </Reveal>
           ))}
@@ -556,19 +518,10 @@ export function Liza() {
 }
 
 /* ---------- CONSULTORIAS ---------- */
-export function Consultorias() {
-  const items = [
-    {
-      title: "Gründer & Selbstständige",
-      phrase: "Ein Unternehmen aufzubauen muss kein einsamer Weg sein. Wir begleiten Sie von der Idee bis zum Wachstum.",
-      img: gruenderImg,
-    },
-    {
-      title: "Kleine Unternehmen",
-      phrase: "Ein erfolgreiches Geschäft entsteht aus Tagen voller Arbeit, Leidenschaft und Hingabe.",
-      img: kleinunternehmenImg,
-    },
-  ];
+const CONSULTORIAS_IMAGES = [gruenderImg, kleinunternehmenImg];
+
+export function Consultorias({ content }: { content: SiteContent["consultorias"] }) {
+  const items = content.map((it, i) => ({ ...it, img: CONSULTORIAS_IMAGES[i] }));
   return (
     <section id="consultorias" className="py-32 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -731,17 +684,11 @@ export function Neuromarketing() {
 }
 
 /* ---------- SERVICE CARDS (shared home + leistungen) ---------- */
-const SERVICES = [
-  { t: "Digitales Marketing", d: "Wirkungsvolle Strategien, um Kunden zu gewinnen und zu überzeugen." },
-  { t: "Design", d: "Visuelle Identität mit Zweck und Emotion." },
-  { t: "Werbung", d: "Kampagnen, die Aufmerksamkeit in Kunden verwandeln." },
-];
-
-export function ServiceCards() {
+export function ServiceCards({ services }: { services: SiteContent["servicios"]["services"] }) {
   return (
     <div className="grid md:grid-cols-3 gap-6">
-      {SERVICES.map((it, i) => (
-        <Reveal key={it.t} delay={i * 0.1}>
+      {services.map((it, i) => (
+        <Reveal key={it.title} delay={i * 0.1}>
           <motion.div
             whileHover={{ y: -12, rotateX: 3 }}
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
@@ -753,8 +700,8 @@ export function ServiceCards() {
               0{i + 1}
             </div>
             <div className="absolute bottom-7 left-7 right-7">
-              <h3 className="text-2xl font-display font-bold mb-2 capitalize">{it.t}</h3>
-              <p className="text-muted-foreground text-sm">{it.d}</p>
+              <h3 className="text-2xl font-display font-bold mb-2 capitalize">{it.title}</h3>
+              <p className="text-muted-foreground text-sm">{it.text}</p>
             </div>
             <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -768,7 +715,7 @@ export function ServiceCards() {
 }
 
 /* ---------- LEISTUNGEN TEASER (home) ---------- */
-export function LeistungenTeaser() {
+export function LeistungenTeaser({ services }: { services: SiteContent["servicios"]["services"] }) {
   return (
     <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
@@ -782,7 +729,7 @@ export function LeistungenTeaser() {
           </Reveal>
         </div>
 
-        <ServiceCards />
+        <ServiceCards services={services} />
 
         <Reveal className="mt-14 text-center">
           <MagneticButton href="/leistungen" primary>
@@ -795,40 +742,22 @@ export function LeistungenTeaser() {
 }
 
 /* ---------- SERVICIOS (full, leistungen page) ---------- */
-export function Servicios() {
-  const spezial = [
-    {
-      t: "Geschäftsstrategie",
-      d: "Wir analysieren Ihr Geschäft, erkennen Potenziale und zeigen Ihnen, auf welche Produkte Sie sich konzentrieren sollten und wie Sie mehr verkaufen. Vom Handwerksbetrieb bis zum jungen Unternehmen.",
-    },
-    {
-      t: "Kursdesign",
-      d: "Sie sind Experte auf Ihrem Gebiet und möchten Ihr Wissen weitergeben? Wir entwickeln die Strategie und den Aufbau Ihres Kurses, angepasst an Sie und Ihr Publikum.",
-    },
-    {
-      t: "Fundraising",
-      d: "Wir wissen, wie man Projekte überzeugend präsentiert. So gewinnen wir Mittel und Ressourcen für Ihr Vorhaben.",
-    },
-    {
-      t: "Chinesische Medizin",
-      d: "Fundiertes Fachwissen in Traditioneller Chinesischer Medizin. Beratung und Begleitung in diesem besonderen Bereich.",
-    },
-  ];
+export function Servicios({ content }: { content: SiteContent["servicios"] }) {
   return (
     <section id="servicios" className="py-32 px-6 bg-secondary/40">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-12 gap-12 mb-16 items-end">
           <Reveal className="lg:col-span-7">
             <SectionLabel>Leistungen</SectionLabel>
-            <h2 className="text-4xl sm:text-6xl font-display font-bold">Alles, was Ihre Marke braucht, an einem Ort.</h2>
+            <h2 className="text-4xl sm:text-6xl font-display font-bold">{content.heading}</h2>
           </Reveal>
           <Reveal delay={0.15} className="lg:col-span-5 text-muted-foreground text-lg">
-            Integrierte Lösungen für Wachstum mit Identität, Klarheit und nachhaltigen Ergebnissen.
+            {content.subheading}
           </Reveal>
         </div>
 
         <div className="mb-16">
-          <ServiceCards />
+          <ServiceCards services={content.services} />
         </div>
 
         <div className="mb-16">
@@ -840,8 +769,8 @@ export function Servicios() {
             <h3 className="text-2xl sm:text-4xl font-display font-bold">Beratung, die über Marketing hinausgeht.</h3>
           </Reveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {spezial.map((it, i) => (
-              <Reveal key={it.t} delay={i * 0.1} className="h-full">
+            {content.spezial.map((it, i) => (
+              <Reveal key={it.title} delay={i * 0.1} className="h-full">
                 <motion.div
                   whileHover={{ y: -10, scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 200, damping: 18 }}
@@ -852,8 +781,8 @@ export function Servicios() {
                   <div className="w-10 h-10 rounded-lg grid place-items-center bg-amber-warm/15 text-amber-warm font-display font-bold mb-4">
                     0{i + 4}
                   </div>
-                  <h4 className="font-display font-semibold text-lg mb-2">{it.t}</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{it.d}</p>
+                  <h4 className="font-display font-semibold text-lg mb-2">{it.title}</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{it.text}</p>
                 </motion.div>
               </Reveal>
             ))}
@@ -932,7 +861,7 @@ export function KiSoftware() {
 }
 
 /* ---------- BRANDING ---------- */
-export function Branding() {
+export function Branding({ content }: { content: SiteContent["branding"] }) {
   return (
     <section id="branding" className="py-32 px-6 bg-cream relative overflow-hidden">
       <div className="relative max-w-5xl mx-auto text-center">
@@ -943,12 +872,7 @@ export function Branding() {
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
-          <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-            Wir betrachten Ihr Unternehmen als Ganzes. Dabei prüfen wir, was Ihre Zielgruppe braucht, welche
-            Trends wichtig sind und wohin Sie sich entwickeln möchten. So stellen wir das passende Paket für Sie
-            zusammen, mit Texten, Bildern und Videos, mit der Planung von Kampagnen und mit der Pflege Ihrer
-            Gemeinschaft in den sozialen Netzwerken.
-          </p>
+          <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">{content.paragraph}</p>
         </Reveal>
       </div>
     </section>
@@ -1045,7 +969,7 @@ export function KontaktCTA() {
 }
 
 /* ---------- CONTACTO ---------- */
-export function Contacto() {
+export function Contacto({ content }: { content: SiteContent["contact"] }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
   return (
     <section id="contacto" className="pt-44 pb-32 px-6 bg-secondary/40">
@@ -1056,9 +980,9 @@ export function Contacto() {
             Sprechen wir über Ihren <span className="text-gradient-warm">nächsten Schritt</span>.
           </h1>
           <div className="space-y-5 text-muted-foreground">
-            <ContactRow icon="📍" label="Gfell 1002, 9053 Teufen, Schweiz" />
-            <ContactRow icon="✉" label="info@lf-business-consulting.com" href="mailto:info@lf-business-consulting.com" />
-            <ContactRow icon="☎" label="+41 77 471 70 06" href="tel:+41774717006" />
+            <ContactRow icon="📍" label={content.address} />
+            <ContactRow icon="✉" label={content.email} href={`mailto:${content.email}`} />
+            <ContactRow icon="☎" label={content.phone} href={`tel:${content.phone.replace(/\s+/g, "")}`} />
           </div>
           <div className="flex gap-3 mt-10">
             {[{ n: "IG", u: "#" }, { n: "in", u: "#" }].map((s) => (

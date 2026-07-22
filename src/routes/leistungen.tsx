@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Consultorias, Servicios, Neuromarketing, Branding, KontaktCTA } from "@/components/sections";
+import { getContent } from "@/lib/content";
 
 export const Route = createFileRoute("/leistungen")({
+  loader: () => getContent(),
   head: () => ({
     meta: [
       { title: "Leistungen | LF Marketing & Business Consulting" },
@@ -14,14 +16,15 @@ export const Route = createFileRoute("/leistungen")({
 });
 
 function Leistungen() {
+  const content = Route.useLoaderData();
   return (
     <PageShell>
       <div className="pt-16">
-        <Consultorias />
+        <Consultorias content={content.consultorias} />
       </div>
-      <Servicios />
+      <Servicios content={content.servicios} />
       <Neuromarketing />
-      <Branding />
+      <Branding content={content.branding} />
       <KontaktCTA />
     </PageShell>
   );
