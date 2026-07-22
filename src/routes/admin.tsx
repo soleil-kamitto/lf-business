@@ -99,20 +99,20 @@ function AdminPage() {
       </div>
 
       <Section title="Startseite (Hero)">
-        <Field label="Badge (unter dem Logo)" value={content.hero.badge} onChange={(v) => setContent({ ...content, hero: { ...content.hero, badge: v } })} />
-        <Field label="Titel" value={content.hero.title} onChange={(v) => setContent({ ...content, hero: { ...content.hero, title: v } })} textarea />
-        <Field label="Untertitel" value={content.hero.subtitle} onChange={(v) => setContent({ ...content, hero: { ...content.hero, subtitle: v } })} textarea />
+        <Field label="Badge (unter dem Logo)" value={content.hero.badge} onChange={(v) => setContent({ ...content, hero: { ...content.hero, badge: v } })} preview="badge" />
+        <Field label="Titel" value={content.hero.title} onChange={(v) => setContent({ ...content, hero: { ...content.hero, title: v } })} textarea preview="hero-title" />
+        <Field label="Untertitel" value={content.hero.subtitle} onChange={(v) => setContent({ ...content, hero: { ...content.hero, subtitle: v } })} textarea preview="body-dark" />
       </Section>
 
       <Section title="Über uns">
-        <Field label="Absatz 1" value={content.about.paragraph1} onChange={(v) => setContent({ ...content, about: { ...content.about, paragraph1: v } })} textarea />
-        <Field label="Absatz 2" value={content.about.paragraph2} onChange={(v) => setContent({ ...content, about: { ...content.about, paragraph2: v } })} textarea />
+        <Field label="Absatz 1" value={content.about.paragraph1} onChange={(v) => setContent({ ...content, about: { ...content.about, paragraph1: v } })} textarea preview="body-light" />
+        <Field label="Absatz 2" value={content.about.paragraph2} onChange={(v) => setContent({ ...content, about: { ...content.about, paragraph2: v } })} textarea preview="body-light" />
       </Section>
 
       <Section title="Liza Fässler">
-        <Field label="Unterzeile" value={content.liza.subheading} onChange={(v) => setContent({ ...content, liza: { ...content.liza, subheading: v } })} />
-        <Field label="Biografie, Absatz 1" value={content.liza.bio1} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio1: v } })} textarea />
-        <Field label="Biografie, Absatz 2" value={content.liza.bio2} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio2: v } })} textarea />
+        <Field label="Unterzeile" value={content.liza.subheading} onChange={(v) => setContent({ ...content, liza: { ...content.liza, subheading: v } })} preview="eyebrow" />
+        <Field label="Biografie, Absatz 1" value={content.liza.bio1} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio1: v } })} textarea preview="body-light" />
+        <Field label="Biografie, Absatz 2" value={content.liza.bio2} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio2: v } })} textarea preview="body-light" />
 
         <h3 style={styles.h3}>Werdegang (Zeitleiste)</h3>
         {content.liza.journey.map((j, i) => (
@@ -125,6 +125,7 @@ function AdminPage() {
                 journey[i] = { ...journey[i], year: v };
                 setContent({ ...content, liza: { ...content.liza, journey } });
               }}
+              preview="card-title"
             />
             <Field
               label="Beschreibung"
@@ -135,6 +136,7 @@ function AdminPage() {
                 setContent({ ...content, liza: { ...content.liza, journey } });
               }}
               textarea
+              preview="card-text"
             />
           </div>
         ))}
@@ -150,6 +152,7 @@ function AdminPage() {
                 expertise[i] = { ...expertise[i], title: v };
                 setContent({ ...content, liza: { ...content.liza, expertise } });
               }}
+              preview="card-title"
             />
             <Field
               label="Text"
@@ -160,6 +163,7 @@ function AdminPage() {
                 setContent({ ...content, liza: { ...content.liza, expertise } });
               }}
               textarea
+              preview="card-text"
             />
           </div>
         ))}
@@ -176,6 +180,7 @@ function AdminPage() {
                 consultorias[i] = { ...consultorias[i], title: v };
                 setContent({ ...content, consultorias });
               }}
+              preview="card-title-dark"
             />
             <Field
               label="Satz"
@@ -186,14 +191,15 @@ function AdminPage() {
                 setContent({ ...content, consultorias });
               }}
               textarea
+              preview="card-text-dark"
             />
           </div>
         ))}
       </Section>
 
       <Section title="Leistungen">
-        <Field label="Überschrift" value={content.servicios.heading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, heading: v } })} />
-        <Field label="Unterzeile" value={content.servicios.subheading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, subheading: v } })} textarea />
+        <Field label="Überschrift" value={content.servicios.heading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, heading: v } })} preview="heading" />
+        <Field label="Unterzeile" value={content.servicios.subheading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, subheading: v } })} textarea preview="body-light" />
 
         <h3 style={styles.h3}>Kernleistungen</h3>
         {content.servicios.services.map((s, i) => (
@@ -206,6 +212,7 @@ function AdminPage() {
                 services[i] = { ...services[i], title: v };
                 setContent({ ...content, servicios: { ...content.servicios, services } });
               }}
+              preview="card-title"
             />
             <Field
               label="Text"
@@ -216,6 +223,7 @@ function AdminPage() {
                 setContent({ ...content, servicios: { ...content.servicios, services } });
               }}
               textarea
+              preview="card-text"
             />
           </div>
         ))}
@@ -231,6 +239,7 @@ function AdminPage() {
                 spezial[i] = { ...spezial[i], title: v };
                 setContent({ ...content, servicios: { ...content.servicios, spezial } });
               }}
+              preview="card-title"
             />
             <Field
               label="Text"
@@ -241,19 +250,20 @@ function AdminPage() {
                 setContent({ ...content, servicios: { ...content.servicios, spezial } });
               }}
               textarea
+              preview="card-text"
             />
           </div>
         ))}
       </Section>
 
       <Section title="Branding">
-        <Field label="Text" value={content.branding.paragraph} onChange={(v) => setContent({ ...content, branding: { ...content.branding, paragraph: v } })} textarea />
+        <Field label="Text" value={content.branding.paragraph} onChange={(v) => setContent({ ...content, branding: { ...content.branding, paragraph: v } })} textarea preview="body-cream" />
       </Section>
 
       <Section title="Kontakt">
-        <Field label="Adresse" value={content.contact.address} onChange={(v) => setContent({ ...content, contact: { ...content.contact, address: v } })} />
-        <Field label="E-Mail" value={content.contact.email} onChange={(v) => setContent({ ...content, contact: { ...content.contact, email: v } })} />
-        <Field label="Telefon" value={content.contact.phone} onChange={(v) => setContent({ ...content, contact: { ...content.contact, phone: v } })} />
+        <Field label="Adresse" value={content.contact.address} onChange={(v) => setContent({ ...content, contact: { ...content.contact, address: v } })} preview="small" />
+        <Field label="E-Mail" value={content.contact.email} onChange={(v) => setContent({ ...content, contact: { ...content.contact, email: v } })} preview="small" />
+        <Field label="Telefon" value={content.contact.phone} onChange={(v) => setContent({ ...content, contact: { ...content.contact, phone: v } })} preview="small" />
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end", padding: "1rem 0 3rem" }}>
@@ -274,26 +284,115 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+type PreviewKind =
+  | "hero-title"
+  | "badge"
+  | "body-dark"
+  | "body-light"
+  | "body-cream"
+  | "eyebrow"
+  | "heading"
+  | "card-title"
+  | "card-text"
+  | "card-title-dark"
+  | "card-text-dark"
+  | "small";
+
+const HERO_HIGHLIGHT_WORDS = ["vor,", "inspirieren", "gestalten"];
+
 function Field({
   label,
   value,
   onChange,
   textarea,
+  preview,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   textarea?: boolean;
+  preview?: PreviewKind;
 }) {
   return (
-    <label style={styles.field}>
-      <span style={styles.label}>{label}</span>
-      {textarea ? (
-        <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} style={styles.textarea} />
-      ) : (
-        <input value={value} onChange={(e) => onChange(e.target.value)} style={styles.input} />
-      )}
-    </label>
+    <div className="grid sm:grid-cols-2 gap-3 sm:gap-5 mb-4 items-start">
+      <label style={{ ...styles.field, marginBottom: 0 }}>
+        <span style={styles.label}>{label}</span>
+        {textarea ? (
+          <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} style={styles.textarea} />
+        ) : (
+          <input value={value} onChange={(e) => onChange(e.target.value)} style={styles.input} />
+        )}
+      </label>
+      {preview && <LivePreview kind={preview} text={value} />}
+    </div>
+  );
+}
+
+function LivePreview({ kind, text }: { kind: PreviewKind; text: string }) {
+  const wrapperDark = kind === "hero-title" || kind === "badge" || kind === "body-dark";
+  const wrapperCream = kind === "body-cream" || kind === "heading";
+  const wrapperOverlay = kind === "card-title-dark" || kind === "card-text-dark";
+
+  return (
+    <div
+      className={`rounded-xl overflow-hidden border ${
+        wrapperDark || wrapperOverlay ? "border-black/20" : "border-border"
+      }`}
+    >
+      <div
+        className="text-[10px] uppercase tracking-[0.15em] px-3 py-1 font-sans"
+        style={{
+          background: wrapperDark || wrapperOverlay ? "#00000030" : "#00000008",
+          color: wrapperDark || wrapperOverlay ? "#ffffffa0" : "#00000060",
+        }}
+      >
+        Vorschau
+      </div>
+      <div
+        className={`p-4 min-h-[3.5rem] flex items-center ${
+          wrapperDark
+            ? "bg-[#15151c]"
+            : wrapperOverlay
+              ? "bg-[#1a1a1a]"
+              : wrapperCream
+                ? "bg-cream"
+                : "bg-background"
+        }`}
+      >
+        {kind === "hero-title" ? (
+          <h1 className="font-display font-bold text-2xl leading-[1.1] text-white">
+            {text.split(" ").map((w, i) => (
+              <span key={i} className={`inline-block mr-1.5 ${HERO_HIGHLIGHT_WORDS.includes(w) ? "text-gradient-warm italic" : ""}`}>
+                {w}
+              </span>
+            ))}
+          </h1>
+        ) : kind === "badge" ? (
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/25 bg-white/10 text-[11px] uppercase tracking-[0.2em] text-white/90">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-warm" />
+            {text}
+          </span>
+        ) : kind === "body-dark" ? (
+          <p className="text-white/75 text-base leading-relaxed">{text}</p>
+        ) : kind === "body-light" || kind === "body-cream" ? (
+          <p className="text-muted-foreground text-base leading-relaxed">{text}</p>
+        ) : kind === "eyebrow" ? (
+          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{text}</p>
+        ) : kind === "heading" ? (
+          <h2 className="font-display font-bold text-xl text-foreground leading-tight">{text}</h2>
+        ) : kind === "card-title" ? (
+          <h3 className="font-display font-semibold text-lg text-foreground">{text}</h3>
+        ) : kind === "card-text" ? (
+          <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
+        ) : kind === "card-title-dark" ? (
+          <h3 className="font-display font-bold text-xl text-white">{text}</h3>
+        ) : kind === "card-text-dark" ? (
+          <p className="text-sm text-white/80 leading-relaxed">{text}</p>
+        ) : (
+          <p className="text-sm text-muted-foreground">{text}</p>
+        )}
+      </div>
+    </div>
   );
 }
 
