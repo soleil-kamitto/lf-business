@@ -53,6 +53,7 @@ export const defaultContent: SiteContent = {
     bio2:
       "Sie führt Unternehmen von der ersten Idee bis zur Skalierung. Ihre Initiativen schaffen heute echten Wert: von innovativen Räumen für gemeinsames Arbeiten bis zu Bildungsplattformen für MINT, die ganze Gemeinschaften erreichen. Ihr Gespür für starke Marken, kluge Verhandlungen und strategische Netzwerke zeichnet sie aus.",
     journey: [
+      { year: "Peru", text: "Ich wurde in Peru geboren und legte dort meine ersten beruflichen Schritte." },
       { year: "Brasilien", text: "Leitung kultureller Events und erste unternehmerische Schritte." },
       { year: "Schweiz", text: "Aufbau der eigenen Praxis als unabhängige Beraterin für Unternehmen und Gründer." },
       { year: "Heute", text: "Gründerin von miniMINTwelt und strategische Begleiterin für Wachstum und Nachhaltigkeit." },
