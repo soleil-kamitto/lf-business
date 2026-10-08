@@ -7,7 +7,7 @@ export const Route = createFileRoute("/leistungen")({
   head: () => ({
     meta: [
       { title: "Leistungen | LF Marketing & Business Consulting" },
-      { name: "description", content: "Digitales Marketing, Design, Werbung, Geschäftsstrategie, Kursdesign, Fundraising, Neuromarketing und Branding. Dazu KI und Software für Unternehmen im Appenzellerland." },
+      { name: "description", content: "Digitales Marketing, Design, Werbung, Geschäftsstrategie, Kursdesign, Neuromarketing und Branding. Dazu KI und Software für Unternehmen im Appenzellerland." },
       { property: "og:title", content: "Leistungen | LF Marketing & Business Consulting" },
     ],
     links: [{ rel: "canonical", href: "/leistungen" }],
