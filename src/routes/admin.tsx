@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { checkAdminAuth, loginAdmin, logoutAdmin } from "@/lib/adminAuth";
 import { getContent, saveContent, uploadImage, type SiteContent, type ImageSlot } from "@/lib/content";
+import { Highlight } from "@/lib/highlight";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -157,6 +158,11 @@ function AdminPage() {
         {/* Right: editor */}
         <div style={{ flex: 1, overflowY: "auto", background: B.cream }}>
           <div style={{ maxWidth: 680, margin: "0 auto", padding: "1.5rem 1.5rem 4rem" }}>
+
+            <div style={S.hintBox}>
+              <strong style={{ color: B.amber }}>Tipp</strong> · Text zwischen Sternchen erscheint in der goldenen
+              Akzentfarbe. Beispiel: Wir bauen <code style={S.code}>*Marken mit Seele*</code>.
+            </div>
 
             <EditorSection title="Startseite (Hero)">
               <Field label="Badge (unter dem Logo)" value={content.hero.badge} onChange={(v) => setContent({ ...content, hero: { ...content.hero, badge: v } })} preview="badge" />
@@ -445,7 +451,7 @@ function LivePreview({ kind, text }: { kind: PreviewKind; text: string }) {
         ) : kind === "eyebrow" ? (
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{text}</p>
         ) : kind === "heading" ? (
-          <h2 className="font-display font-bold text-xl text-foreground leading-tight">{text}</h2>
+          <h2 className="font-display font-bold text-xl text-foreground leading-tight"><Highlight text={text} /></h2>
         ) : kind === "card-title" ? (
           <h3 className="font-display font-semibold text-lg text-foreground">{text}</h3>
         ) : kind === "card-text" ? (
@@ -501,6 +507,24 @@ const S: Record<string, React.CSSProperties> = {
     marginBottom: "1rem",
     paddingBottom: "0.75rem",
     borderBottom: `1px solid ${B.border}`,
+  },
+  hintBox: {
+    background: B.amberLight,
+    border: `1px solid ${B.amber}40`,
+    borderRadius: 10,
+    padding: "0.7rem 0.9rem",
+    marginBottom: "1rem",
+    fontSize: "0.8rem",
+    color: B.text,
+    lineHeight: 1.5,
+  },
+  code: {
+    background: "#ffffff",
+    border: `1px solid ${B.border}`,
+    borderRadius: 4,
+    padding: "0.1rem 0.3rem",
+    fontFamily: "ui-monospace, monospace",
+    fontSize: "0.75rem",
   },
   sectionDot: {
     width: 6,

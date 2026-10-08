@@ -69,7 +69,7 @@ export const defaultContent: SiteContent = {
       "Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice, digitales Marketing, Branding und Neuromarketing, damit sich Ihr Unternehmen wirklich abhebt.",
   },
   about: {
-    heading: "Strategie, Design und Neurowissenschaft im Dienst Ihres Unternehmens.",
+    heading: "Von der Idee bis zur Positionierung - Strategie, Marketing und Kommunikation *aus einer Hand*.",
     paragraph1:
       "Bei LF Marketing & Business Consulting helfen wir bestehenden und zukünftigen Unternehmen, ihren Kundenservice zu verbessern und sich von anderen Anbietern abzuheben.",
     paragraph2:
@@ -142,18 +142,10 @@ export const defaultContent: SiteContent = {
         title: "Kursdesign",
         text: "Sie sind Experte auf Ihrem Gebiet und möchten Ihr Wissen weitergeben? Wir entwickeln die Strategie und den Aufbau Ihres Kurses, angepasst an Sie und Ihr Publikum.",
       },
-      {
-        title: "Fundraising",
-        text: "Wir wissen, wie man Projekte überzeugend präsentiert. So gewinnen wir Mittel und Ressourcen für Ihr Vorhaben.",
-      },
-      {
-        title: "Chinesische Medizin",
-        text: "Fundiertes Fachwissen in Traditioneller Chinesischer Medizin. Beratung und Begleitung in diesem besonderen Bereich.",
-      },
     ],
   },
   neuroContent: {
-    heading: "Wie Neurowissenschaft und Design Konsumenten beeinflussen.",
+    heading: "Wie *Neurowissenschaft* und Design Konsumenten beeinflussen.",
     description: "Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden.",
     cards: [
       { title: "Social Media", text: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
@@ -163,7 +155,7 @@ export const defaultContent: SiteContent = {
     ],
   },
   kiContent: {
-    heading: "Die digitale Zukunft für Unternehmen im Appenzellerland.",
+    heading: "Die *digitale Zukunft* für Unternehmen im Appenzellerland.",
     description: "Wir bringen künstliche Intelligenz und moderne Software zu Unternehmen in Appenzell und der Ostschweiz. Sehen Sie im Video, wie wir Ideen mit Technologie verbinden.",
   },
   clientesHeading: "Marken, die uns bereits vertrauen.",
@@ -175,9 +167,9 @@ export const defaultContent: SiteContent = {
     label: "Bereit für den nächsten Schritt?",
     heading: "Lassen Sie uns über Ihr Unternehmen sprechen.",
   },
-  contactoHeading: "Sprechen wir über Ihren nächsten Schritt.",
+  contactoHeading: "Sprechen wir über Ihren *nächsten Schritt*.",
   branding: {
-    heading: "Wir gestalten nicht nur Anzeigen. Wir bauen Marken mit Seele.",
+    heading: "Wir gestalten nicht nur Anzeigen. Wir bauen *Marken mit Seele*.",
     paragraph:
       "Wir betrachten Ihr Unternehmen als Ganzes. Dabei prüfen wir, was Ihre Zielgruppe braucht, welche Trends wichtig sind und wohin Sie sich entwickeln möchten. So stellen wir das passende Paket für Sie zusammen, mit Texten, Bildern und Videos, mit der Planung von Kampagnen und mit der Pflege Ihrer Gemeinschaft in den sozialen Netzwerken.",
   },
