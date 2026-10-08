@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Hero, Marquee, LeistungenTeaser, Clientes, KontaktCTA } from "@/components/sections";
 import { getContent } from "@/lib/content";
+import { localBusinessJsonLd } from "@/lib/structuredData";
 
 export const Route = createFileRoute("/")({
   loader: () => getContent(),
-  head: () => ({
+  head: ({ loaderData }) => ({
+    scripts: loaderData
+      ? [{ type: "application/ld+json", children: localBusinessJsonLd(loaderData) }]
+      : [],
     meta: [
       { title: "LF Marketing & Business Consulting | Beratung für Unternehmer" },
       { name: "description", content: "Kostenlose Beratung für Unternehmen, Selbstständige und Gründer. Digitales Marketing, Branding, Neuromarketing, Geschäftsstrategie und Kursdesign. Aus Teufen in der Schweiz." },

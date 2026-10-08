@@ -14,6 +14,7 @@ import { Route as LeistungenRouteImport } from './routes/leistungen'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiAnalyticsImportRouteImport } from './routes/api.analytics-import'
 
 const UeberUnsRoute = UeberUnsRouteImport.update({
   id: '/ueber-uns',
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAnalyticsImportRoute = ApiAnalyticsImportRouteImport.update({
+  id: '/api/analytics-import',
+  path: '/api/analytics-import',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/kontakt': typeof KontaktRoute
   '/leistungen': typeof LeistungenRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/api/analytics-import': typeof ApiAnalyticsImportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/kontakt': typeof KontaktRoute
   '/leistungen': typeof LeistungenRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/api/analytics-import': typeof ApiAnalyticsImportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,33 @@ export interface FileRoutesById {
   '/kontakt': typeof KontaktRoute
   '/leistungen': typeof LeistungenRoute
   '/ueber-uns': typeof UeberUnsRoute
+  '/api/analytics-import': typeof ApiAnalyticsImportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/kontakt' | '/leistungen' | '/ueber-uns'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/kontakt'
+    | '/leistungen'
+    | '/ueber-uns'
+    | '/api/analytics-import'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/kontakt' | '/leistungen' | '/ueber-uns'
-  id: '__root__' | '/' | '/admin' | '/kontakt' | '/leistungen' | '/ueber-uns'
+  to:
+    | '/'
+    | '/admin'
+    | '/kontakt'
+    | '/leistungen'
+    | '/ueber-uns'
+    | '/api/analytics-import'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/kontakt'
+    | '/leistungen'
+    | '/ueber-uns'
+    | '/api/analytics-import'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +105,7 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   LeistungenRoute: typeof LeistungenRoute
   UeberUnsRoute: typeof UeberUnsRoute
+  ApiAnalyticsImportRoute: typeof ApiAnalyticsImportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/analytics-import': {
+      id: '/api/analytics-import'
+      path: '/api/analytics-import'
+      fullPath: '/api/analytics-import'
+      preLoaderRoute: typeof ApiAnalyticsImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   LeistungenRoute: LeistungenRoute,
   UeberUnsRoute: UeberUnsRoute,
+  ApiAnalyticsImportRoute: ApiAnalyticsImportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { checkAdminAuth, loginAdmin, logoutAdmin } from "@/lib/adminAuth";
 import { getContent, saveContent, uploadImage, type SiteContent, type ImageSlot } from "@/lib/content";
+import { getAnalytics, type AnalyticsView } from "@/lib/analytics";
 import { Highlight } from "@/lib/highlight";
 
 export const Route = createFileRoute("/admin")({
@@ -25,6 +26,8 @@ const B = {
   muted: "#6b6355",
   error: "#c0392b",
   success: "#2e7d4f",
+  // Darker than the brand amber so bars clear 3:1 against the cream surface.
+  bar: "#a8702c",
 };
 
 function AdminPage() {
@@ -33,6 +36,8 @@ function AdminPage() {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [tab, setTab] = useState<"inhalte" | "statistiken">("inhalte");
+  const [stats, setStats] = useState<AnalyticsView | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -42,6 +47,12 @@ function AdminPage() {
   useEffect(() => {
     if (authed) getContent().then(setContent);
   }, [authed]);
+
+  // Loading here also refreshes the archive, so it keeps filling even if the
+  // daily cron stops running.
+  useEffect(() => {
+    if (authed && tab === "statistiken" && !stats) getAnalytics().then(setStats);
+  }, [authed, tab, stats]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -109,27 +120,39 @@ function AdminPage() {
             LF Business
           </span>
           <span style={{ color: "rgba(255,255,255,0.2)", margin: "0 0.25rem" }}>·</span>
-          <h1 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "#fff", fontFamily: "'Space Grotesk', sans-serif" }}>
-            Inhalte bearbeiten
-          </h1>
+          <nav style={{ display: "flex", gap: "0.25rem" }}>
+            <button onClick={() => setTab("inhalte")} style={tab === "inhalte" ? S.tabOn : S.tabOff}>
+              Inhalte
+            </button>
+            <button onClick={() => setTab("statistiken")} style={tab === "statistiken" ? S.tabOn : S.tabOff}>
+              Statistiken
+            </button>
+          </nav>
         </div>
         <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
-          {status === "saved" && (
-            <span style={{ color: "#7ed4a0", fontSize: "0.82rem", fontWeight: 600 }}>Gespeichert ✓</span>
+          {tab === "inhalte" && (
+            <>
+              {status === "saved" && (
+                <span style={{ color: "#7ed4a0", fontSize: "0.82rem", fontWeight: 600 }}>Gespeichert ✓</span>
+              )}
+              {status === "error" && (
+                <span style={{ color: "#f87171", fontSize: "0.82rem" }}>Fehler beim Speichern</span>
+              )}
+              <button onClick={handleSave} disabled={status === "saving"} style={S.primaryBtn}>
+                {status === "saving" ? "Speichert…" : "Speichern"}
+              </button>
+            </>
           )}
-          {status === "error" && (
-            <span style={{ color: "#f87171", fontSize: "0.82rem" }}>Fehler beim Speichern</span>
-          )}
-          <button onClick={handleSave} disabled={status === "saving"} style={S.primaryBtn}>
-            {status === "saving" ? "Speichert…" : "Speichern"}
-          </button>
           <button onClick={() => logoutAdmin().then(() => setAuthed(false))} style={S.ghostBtn}>
             Abmelden
           </button>
         </div>
       </header>
 
+      {tab === "statistiken" && <AnalyticsPanel stats={stats} onReload={() => setStats(null)} />}
+
       {/* ── Split body ── */}
+      {tab === "inhalte" && (
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         {/* Left: website iframe */}
@@ -333,6 +356,160 @@ function AdminPage() {
           </div>
         </div>
       </div>
+      )}
+    </div>
+  );
+}
+
+const DE = new Intl.NumberFormat("de-CH");
+
+const STATUS_NOTE: Record<AnalyticsView["status"], string | null> = {
+  ok: null,
+  "no-data": "Noch keine Daten. Vercel sammelt die ersten Besuche; in einigen Minuten erscheinen sie hier.",
+  "no-token": "Der Zugang zu den Zahlen ist nicht eingerichtet. Bitte Soleil Bescheid geben.",
+  "token-invalid": "Der Zugang ist abgelaufen. Die unten gezeigten Zahlen stammen aus dem Archiv und werden gerade nicht aktualisiert.",
+  error: "Die Zahlen konnten nicht frisch geladen werden. Unten steht der zuletzt gespeicherte Stand.",
+};
+
+function AnalyticsPanel({ stats, onReload }: { stats: AnalyticsView | null; onReload: () => void }) {
+  if (!stats) {
+    return (
+      <div style={S.statsWrap}>
+        <p style={{ color: B.muted, fontSize: "0.9rem" }}>Zahlen werden geladen…</p>
+      </div>
+    );
+  }
+
+  const note = STATUS_NOTE[stats.status];
+  const chartDays = stats.days.slice(-30);
+
+  return (
+    <div style={S.statsWrap}>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
+          <h2 style={{ ...S.h2, fontSize: "1.1rem" }}>Wie viele Menschen besuchen die Website</h2>
+          <button onClick={onReload} style={S.ghostBtnLight}>Aktualisieren</button>
+        </div>
+
+        {note && (
+          <div style={{ ...S.hintBox, background: stats.status === "no-data" ? B.amberLight : "#fdecea", borderColor: stats.status === "no-data" ? `${B.amber}40` : "#f5c6c0" }}>
+            {note}
+          </div>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.75rem", marginBottom: "1.25rem" }}>
+          <StatTile label="Besucher, 30 Tage" value={stats.last30.visitors} big />
+          <StatTile label="Seitenaufrufe, 30 Tage" value={stats.last30.pageviews} />
+          <StatTile label="Besucher insgesamt" value={stats.totals.visitors} />
+          <StatTile label="Seitenaufrufe insgesamt" value={stats.totals.pageviews} />
+        </div>
+
+        {chartDays.length > 0 && <DailyChart days={chartDays} />}
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "0.75rem", marginTop: "1.25rem" }}>
+          <RankedList title="Meistbesuchte Seiten" rows={stats.topPages} />
+          <RankedList title="Länder" rows={stats.topCountries} />
+          <RankedList title="Woher die Besucher kommen" rows={stats.topReferrers} />
+        </div>
+
+        <p style={{ fontSize: "0.72rem", color: B.muted, marginTop: "1.25rem", lineHeight: 1.6 }}>
+          Ein Besucher ist eine Person, ein Seitenaufruf ist eine geöffnete Seite. Eine Person, die drei Seiten
+          anschaut, zählt als ein Besucher und drei Aufrufe. Besuche im Bearbeitungsbereich werden nicht gezählt.
+          {stats.lastImport && ` Zuletzt aktualisiert: ${new Date(stats.lastImport).toLocaleString("de-CH")}.`}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function StatTile({ label, value, big }: { label: string; value: number; big?: boolean }) {
+  return (
+    <div style={S.tile}>
+      <div style={{ fontSize: big ? "2rem" : "1.5rem", fontWeight: 800, color: big ? B.bar : B.text, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1.1 }}>
+        {DE.format(value)}
+      </div>
+      <div style={{ fontSize: "0.7rem", color: B.muted, marginTop: "0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function DailyChart({ days }: { days: { date: string; pageviews: number; visitors: number }[] }) {
+  const [hover, setHover] = useState<number | null>(null);
+  const max = Math.max(...days.map((d) => d.visitors), 1);
+  const fmt = (iso: string) =>
+    new Date(iso + "T00:00:00Z").toLocaleDateString("de-CH", { day: "2-digit", month: "2-digit" });
+
+  return (
+    <div style={S.card}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "0.9rem" }}>
+        <h3 style={{ ...S.h2, fontSize: "0.85rem" }}>Besucher pro Tag</h3>
+        <span style={{ fontSize: "0.7rem", color: B.muted }}>Höchstwert {DE.format(max)}</span>
+      </div>
+
+      <div style={{ position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 150, borderBottom: `1px solid ${B.border}` }}>
+          {days.map((d, i) => (
+            <div
+              key={d.date}
+              onMouseEnter={() => setHover(i)}
+              onMouseLeave={() => setHover(null)}
+              style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end", cursor: "default" }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: `${Math.max((d.visitors / max) * 100, d.visitors > 0 ? 2 : 0)}%`,
+                  background: hover === i ? B.text : B.bar,
+                  borderRadius: "4px 4px 0 0",
+                  transition: "background 0.12s",
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {hover !== null && (
+          <div style={S.tooltip}>
+            <strong>{fmt(days[hover].date)}</strong> · {DE.format(days[hover].visitors)} Besucher ·{" "}
+            {DE.format(days[hover].pageviews)} Aufrufe
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: B.muted, marginTop: "0.4rem" }}>
+        <span>{fmt(days[0].date)}</span>
+        <span>{fmt(days[days.length - 1].date)}</span>
+      </div>
+    </div>
+  );
+}
+
+function RankedList({ title, rows }: { title: string; rows: { name: string; pageviews: number; visitors: number }[] }) {
+  const max = Math.max(...rows.map((r) => r.pageviews), 1);
+  return (
+    <div style={S.card}>
+      <h3 style={{ ...S.h2, fontSize: "0.85rem", marginBottom: "0.75rem" }}>{title}</h3>
+      {rows.length === 0 ? (
+        <p style={{ fontSize: "0.8rem", color: B.muted, margin: 0 }}>Noch keine Daten.</p>
+      ) : (
+        <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+          {rows.slice(0, 7).map((r) => (
+            <li key={r.name}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", fontSize: "0.8rem", marginBottom: 3 }}>
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.name}>
+                  {r.name === "" ? "Direkt" : r.name}
+                </span>
+                <strong style={{ flexShrink: 0 }}>{DE.format(r.pageviews)}</strong>
+              </div>
+              <div style={{ height: 4, background: B.creamDeep, borderRadius: 2 }}>
+                <div style={{ width: `${(r.pageviews / max) * 100}%`, height: "100%", background: B.bar, borderRadius: 2 }} />
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
     </div>
   );
 }
@@ -507,6 +684,68 @@ const S: Record<string, React.CSSProperties> = {
     marginBottom: "1rem",
     paddingBottom: "0.75rem",
     borderBottom: `1px solid ${B.border}`,
+  },
+  tabOn: {
+    background: "rgba(255,255,255,0.12)",
+    color: "#fff",
+    border: "none",
+    borderRadius: 7,
+    padding: "0.35rem 0.8rem",
+    fontSize: "0.82rem",
+    fontWeight: 700,
+    cursor: "pointer",
+    fontFamily: "'Space Grotesk', sans-serif",
+  },
+  tabOff: {
+    background: "transparent",
+    color: "rgba(255,255,255,0.5)",
+    border: "none",
+    borderRadius: 7,
+    padding: "0.35rem 0.8rem",
+    fontSize: "0.82rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontFamily: "'Space Grotesk', sans-serif",
+  },
+  statsWrap: {
+    flex: 1,
+    overflowY: "auto" as const,
+    background: B.cream,
+    padding: "1.5rem",
+  },
+  tile: {
+    background: B.white,
+    border: `1px solid ${B.border}`,
+    borderRadius: 12,
+    padding: "1rem",
+  },
+  card: {
+    background: B.white,
+    border: `1px solid ${B.border}`,
+    borderRadius: 14,
+    padding: "1.1rem 1.25rem",
+  },
+  tooltip: {
+    position: "absolute" as const,
+    top: -6,
+    left: "50%",
+    transform: "translate(-50%, -100%)",
+    background: B.dark,
+    color: "#fff",
+    fontSize: "0.72rem",
+    padding: "0.35rem 0.6rem",
+    borderRadius: 7,
+    whiteSpace: "nowrap" as const,
+    pointerEvents: "none" as const,
+  },
+  ghostBtnLight: {
+    background: "transparent",
+    color: B.muted,
+    border: `1px solid ${B.border}`,
+    borderRadius: 999,
+    padding: "0.35rem 0.9rem",
+    fontSize: "0.78rem",
+    cursor: "pointer",
   },
   hintBox: {
     background: B.amberLight,
