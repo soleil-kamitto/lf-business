@@ -4,7 +4,12 @@ import { requireAdmin } from "@/lib/adminAuth";
 
 export type SiteContent = {
   hero: { badge: string; title: string; subtitle: string };
-  about: { paragraph1: string; paragraph2: string };
+  about: {
+    heading: string;
+    paragraph1: string;
+    paragraph2: string;
+    counters: { value: number; suffix: string; label: string }[];
+  };
   liza: {
     subheading: string;
     bio1: string;
@@ -13,13 +18,36 @@ export type SiteContent = {
     expertise: { title: string; text: string }[];
   };
   consultorias: { title: string; phrase: string }[];
+  consultoriasHeading: string;
   servicios: {
     heading: string;
     subheading: string;
     services: { title: string; text: string }[];
     spezial: { title: string; text: string }[];
+    spezialHeading: string;
+    bannerHeading: string;
+    bannerText: string;
   };
-  branding: { paragraph: string };
+  neuroContent: {
+    heading: string;
+    description: string;
+    cards: { title: string; text: string }[];
+  };
+  kiContent: {
+    heading: string;
+    description: string;
+  };
+  clientesHeading: string;
+  leistungenTeaser: {
+    heading: string;
+    description: string;
+  };
+  kontaktCta: {
+    label: string;
+    heading: string;
+  };
+  contactoHeading: string;
+  branding: { heading: string; paragraph: string };
   contact: { address: string; email: string; phone: string };
   images: {
     lizaPortrait: string | null;
@@ -41,10 +69,16 @@ export const defaultContent: SiteContent = {
       "Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice, digitales Marketing, Branding und Neuromarketing, damit sich Ihr Unternehmen wirklich abhebt.",
   },
   about: {
+    heading: "Strategie, Design und Neurowissenschaft im Dienst Ihres Unternehmens.",
     paragraph1:
       "Bei LF Marketing & Business Consulting helfen wir bestehenden und zukünftigen Unternehmen, ihren Kundenservice zu verbessern und sich von anderen Anbietern abzuheben.",
     paragraph2:
       "Wir verbinden strategische Beratung, digitales Marketing, Branding und Neuromarketing, um Unternehmen mit eigener Identität, menschlichem Fokus und messbaren Ergebnissen aufzubauen.",
+    counters: [
+      { value: 10, suffix: "+", label: "Jahre Erfahrung" },
+      { value: 60, suffix: "+", label: "Begleitete Marken" },
+      { value: 100, suffix: "%", label: "Menschlicher Fokus" },
+    ],
   },
   liza: {
     subheading: "Internationale Unternehmerin · Strategin",
@@ -77,6 +111,7 @@ export const defaultContent: SiteContent = {
       },
     ],
   },
+  consultoriasHeading: "Wir begleiten jede Phase.",
   consultorias: [
     {
       title: "Gründer & Selbstständige",
@@ -95,6 +130,9 @@ export const defaultContent: SiteContent = {
       { title: "Design", text: "Visuelle Identität mit Zweck und Emotion." },
       { title: "Werbung", text: "Kampagnen, die Aufmerksamkeit in Kunden verwandeln." },
     ],
+    spezialHeading: "Beratung, die über Marketing hinausgeht.",
+    bannerHeading: "Bereit zu wachsen?",
+    bannerText: "Erzählen Sie uns von Ihrem Projekt. Wir entwickeln gemeinsam die passende Strategie.",
     spezial: [
       {
         title: "Geschäftsstrategie",
@@ -114,7 +152,32 @@ export const defaultContent: SiteContent = {
       },
     ],
   },
+  neuroContent: {
+    heading: "Wie Neurowissenschaft und Design Konsumenten beeinflussen.",
+    description: "Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden.",
+    cards: [
+      { title: "Social Media", text: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
+      { title: "Design", text: "Gestalten Sie wie eine Fachperson. Nutzen Sie Neuromarketing, das Blicke einfängt und Verkäufe abschliesst." },
+      { title: "Kommunikation", text: "Kommunizieren Sie empathisch und überzeugend, um Menschen wirklich zu erreichen." },
+      { title: "Marketing", text: "Erkennen Sie die digitalen und klassischen Strategien, die Ihre Marke zum Erfolg führen." },
+    ],
+  },
+  kiContent: {
+    heading: "Die digitale Zukunft für Unternehmen im Appenzellerland.",
+    description: "Wir bringen künstliche Intelligenz und moderne Software zu Unternehmen in Appenzell und der Ostschweiz. Sehen Sie im Video, wie wir Ideen mit Technologie verbinden.",
+  },
+  clientesHeading: "Marken, die uns bereits vertrauen.",
+  leistungenTeaser: {
+    heading: "Alles, was Ihre Marke braucht.",
+    description: "Von digitalem Marketing bis Geschäftsstrategie: integrierte Lösungen für nachhaltiges Wachstum.",
+  },
+  kontaktCta: {
+    label: "Bereit für den nächsten Schritt?",
+    heading: "Lassen Sie uns über Ihr Unternehmen sprechen.",
+  },
+  contactoHeading: "Sprechen wir über Ihren nächsten Schritt.",
   branding: {
+    heading: "Wir gestalten nicht nur Anzeigen. Wir bauen Marken mit Seele.",
     paragraph:
       "Wir betrachten Ihr Unternehmen als Ganzes. Dabei prüfen wir, was Ihre Zielgruppe braucht, welche Trends wichtig sind und wohin Sie sich entwickeln möchten. So stellen wir das passende Paket für Sie zusammen, mit Texten, Bildern und Videos, mit der Planung von Kampagnen und mit der Pflege Ihrer Gemeinschaft in den sozialen Netzwerken.",
   },

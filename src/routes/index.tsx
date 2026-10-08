@@ -22,9 +22,9 @@ function Index() {
     <PageShell>
       <Hero content={content.hero} />
       <Marquee />
-      <LeistungenTeaser services={content.servicios.services} />
-      <Clientes />
-      <KontaktCTA />
+      <LeistungenTeaser services={content.servicios.services} content={content.leistungenTeaser} />
+      <Clientes heading={content.clientesHeading} />
+      <KontaktCTA content={content.kontaktCta} />
     </PageShell>
   );
 }

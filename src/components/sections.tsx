@@ -368,16 +368,16 @@ export function About({ content }: { content: SiteContent["about"] }) {
         <Reveal className="lg:col-span-5">
           <SectionLabel>Über uns</SectionLabel>
           <h2 className="text-4xl sm:text-5xl font-display font-bold leading-tight">
-            Strategie, Design und <span className="text-gradient-warm">Neurowissenschaft</span> im Dienst Ihres Unternehmens.
+            {content.heading}
           </h2>
         </Reveal>
         <Reveal delay={0.15} className="lg:col-span-7 text-muted-foreground text-lg leading-relaxed space-y-5">
           <p>{content.paragraph1}</p>
           <p>{content.paragraph2}</p>
           <div className="grid grid-cols-3 gap-6 pt-6">
-            <Counter to={10} suffix="+" label="Jahre Erfahrung" />
-            <Counter to={60} suffix="+" label="Begleitete Marken" />
-            <Counter to={100} suffix="%" label="Menschlicher Fokus" />
+            {(content.counters || []).map((c, i) => (
+              <Counter key={i} to={c.value} suffix={c.suffix} label={c.label} />
+            ))}
           </div>
         </Reveal>
       </div>
@@ -522,9 +522,11 @@ const CONSULTORIAS_IMAGES = [gruenderImg, kleinunternehmenImg];
 
 export function Consultorias({
   content,
+  heading,
   images,
 }: {
   content: SiteContent["consultorias"];
+  heading?: string;
   images?: (string | null)[];
 }) {
   const items = content.map((it, i) => ({ ...it, img: images?.[i] || CONSULTORIAS_IMAGES[i] }));
@@ -533,7 +535,7 @@ export function Consultorias({
       <div className="max-w-7xl mx-auto">
         <Reveal className="text-center mb-16">
           <SectionLabel>Beratung</SectionLabel>
-          <h2 className="text-4xl sm:text-6xl font-display font-bold">Wir begleiten jede Phase.</h2>
+          <h2 className="text-4xl sm:text-6xl font-display font-bold">{heading || "Wir begleiten jede Phase."}</h2>
         </Reveal>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -613,12 +615,12 @@ export function Marquee() {
 }
 
 /* ---------- NEUROMARKETING ---------- */
-export function Neuromarketing({ image }: { image?: string | null }) {
-  const cursos = [
-    { t: "Social Media", d: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
-    { t: "Design", d: "Gestalten Sie wie eine Fachperson. Nutzen Sie Neuromarketing, das Blicke einfängt und Verkäufe abschliesst." },
-    { t: "Kommunikation", d: "Kommunizieren Sie empathisch und überzeugend, um Menschen wirklich zu erreichen." },
-    { t: "Marketing", d: "Erkennen Sie die digitalen und klassischen Strategien, die Ihre Marke zum Erfolg führen." },
+export function Neuromarketing({ image, content }: { image?: string | null; content?: SiteContent["neuroContent"] }) {
+  const cards = content?.cards || [
+    { title: "Social Media", text: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
+    { title: "Design", text: "Gestalten Sie wie eine Fachperson. Nutzen Sie Neuromarketing, das Blicke einfängt und Verkäufe abschliesst." },
+    { title: "Kommunikation", text: "Kommunizieren Sie empathisch und überzeugend, um Menschen wirklich zu erreichen." },
+    { title: "Marketing", text: "Erkennen Sie die digitalen und klassischen Strategien, die Ihre Marke zum Erfolg führen." },
   ];
   return (
     <section id="neuromarketing" className="relative py-32 px-6 bg-background overflow-hidden">
@@ -627,10 +629,10 @@ export function Neuromarketing({ image }: { image?: string | null }) {
           <Reveal>
             <SectionLabel>Neuromarketing</SectionLabel>
             <h2 className="text-4xl sm:text-6xl font-display font-bold leading-tight">
-              Wie <span className="text-gradient-warm">Neurowissenschaft</span> und Design Konsumenten beeinflussen.
+              {content?.heading || "Wie Neurowissenschaft und Design Konsumenten beeinflussen."}
             </h2>
             <p className="mt-6 text-muted-foreground text-lg max-w-lg">
-              Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden.
+              {content?.description || "Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden."}
             </p>
           </Reveal>
           <Reveal delay={0.2}>
@@ -661,8 +663,8 @@ export function Neuromarketing({ image }: { image?: string | null }) {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {cursos.map((c, i) => (
-            <Reveal key={c.t} delay={i * 0.1}>
+          {cards.map((c, i) => (
+            <Reveal key={c.title} delay={i * 0.1}>
               <motion.div
                 whileHover={{ y: -10, rotateX: 6, rotateY: -3, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 200, damping: 18 }}
@@ -678,8 +680,8 @@ export function Neuromarketing({ image }: { image?: string | null }) {
                 >
                   0{i + 1}
                 </motion.div>
-                <h3 className="font-display font-semibold text-xl mb-2">{c.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{c.d}</p>
+                <h3 className="font-display font-semibold text-xl mb-2">{c.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{c.text}</p>
               </motion.div>
             </Reveal>
           ))}
@@ -721,17 +723,17 @@ export function ServiceCards({ services }: { services: SiteContent["servicios"][
 }
 
 /* ---------- LEISTUNGEN TEASER (home) ---------- */
-export function LeistungenTeaser({ services }: { services: SiteContent["servicios"]["services"] }) {
+export function LeistungenTeaser({ services, content }: { services: SiteContent["servicios"]["services"]; content?: SiteContent["leistungenTeaser"] }) {
   return (
     <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-12 gap-12 mb-16 items-end">
           <Reveal className="lg:col-span-7">
             <SectionLabel>Leistungen</SectionLabel>
-            <h2 className="text-4xl sm:text-6xl font-display font-bold">Alles, was Ihre Marke braucht.</h2>
+            <h2 className="text-4xl sm:text-6xl font-display font-bold">{content?.heading || "Alles, was Ihre Marke braucht."}</h2>
           </Reveal>
           <Reveal delay={0.15} className="lg:col-span-5 text-muted-foreground text-lg">
-            Von digitalem Marketing bis Geschäftsstrategie: integrierte Lösungen für nachhaltiges Wachstum.
+            {content?.description || "Von digitalem Marketing bis Geschäftsstrategie: integrierte Lösungen für nachhaltiges Wachstum."}
           </Reveal>
         </div>
 
@@ -772,7 +774,7 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
               <span className="w-8 h-px bg-amber-warm" />
               Spezialgebiete
             </div>
-            <h3 className="text-2xl sm:text-4xl font-display font-bold">Beratung, die über Marketing hinausgeht.</h3>
+            <h3 className="text-2xl sm:text-4xl font-display font-bold">{content.spezialHeading || "Beratung, die über Marketing hinausgeht."}</h3>
           </Reveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {content.spezial.map((it, i) => (
@@ -800,8 +802,8 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
             <img src={bannerImage || servicesImg} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" />
             <div className="relative min-h-72 bg-gradient-to-r from-black/75 via-black/40 to-transparent flex items-center px-6 sm:px-10 py-10">
               <div className="text-white max-w-xl">
-                <h3 className="text-3xl font-display font-bold mb-3">Bereit zu wachsen?</h3>
-                <p className="text-white/80 mb-6">Erzählen Sie uns von Ihrem Projekt. Wir entwickeln gemeinsam die passende Strategie.</p>
+                <h3 className="text-3xl font-display font-bold mb-3">{content.bannerHeading || "Bereit zu wachsen?"}</h3>
+                <p className="text-white/80 mb-6">{content.bannerText || "Erzählen Sie uns von Ihrem Projekt. Wir entwickeln gemeinsam die passende Strategie."}</p>
                 <MagneticButton href="/kontakt" primary>Beratung anfragen</MagneticButton>
               </div>
             </div>
@@ -813,7 +815,7 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
 }
 
 /* ---------- KI & SOFTWARE (video) ---------- */
-export function KiSoftware() {
+export function KiSoftware({ content }: { content?: SiteContent["kiContent"] }) {
   const vidRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   return (
@@ -822,11 +824,10 @@ export function KiSoftware() {
         <Reveal className="text-center mb-14">
           <SectionLabel>KI & Software</SectionLabel>
           <h2 className="text-4xl sm:text-6xl font-display font-bold leading-tight">
-            Die <span className="text-gradient-warm">digitale Zukunft</span> für Unternehmen im Appenzellerland.
+            {content?.heading || "Die digitale Zukunft für Unternehmen im Appenzellerland."}
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-2xl mx-auto">
-            Wir bringen künstliche Intelligenz und moderne Software zu Unternehmen in Appenzell
-            und der Ostschweiz. Sehen Sie im Video, wie wir Ideen mit Technologie verbinden.
+            {content?.description || "Wir bringen künstliche Intelligenz und moderne Software zu Unternehmen in Appenzell und der Ostschweiz. Sehen Sie im Video, wie wir Ideen mit Technologie verbinden."}
           </p>
         </Reveal>
 
@@ -874,7 +875,7 @@ export function Branding({ content }: { content: SiteContent["branding"] }) {
         <Reveal>
           <SectionLabel>Branding</SectionLabel>
           <h2 className="text-4xl sm:text-7xl font-display font-bold leading-[1.05] mb-10">
-            Wir gestalten nicht nur Anzeigen. Wir bauen <span className="text-gradient-warm">Marken mit Seele</span>.
+            {content.heading || "Wir gestalten nicht nur Anzeigen. Wir bauen Marken mit Seele."}
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
@@ -886,7 +887,7 @@ export function Branding({ content }: { content: SiteContent["branding"] }) {
 }
 
 /* ---------- CLIENTES ---------- */
-export function Clientes() {
+export function Clientes({ heading }: { heading?: string }) {
   const brands = [
     {
       key: "minimint",
@@ -915,7 +916,7 @@ export function Clientes() {
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <Reveal>
           <SectionLabel>Kunden & Partner</SectionLabel>
-          <h2 className="text-4xl sm:text-5xl font-display font-bold">Marken, die uns bereits vertrauen.</h2>
+          <h2 className="text-4xl sm:text-5xl font-display font-bold">{heading || "Marken, die uns bereits vertrauen."}</h2>
         </Reveal>
       </div>
       <div className="relative">
@@ -944,17 +945,17 @@ export function Clientes() {
 }
 
 /* ---------- KONTAKT CTA ---------- */
-export function KontaktCTA() {
+export function KontaktCTA({ content }: { content?: SiteContent["kontaktCta"] }) {
   return (
     <section className="relative py-28 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-amber-warm via-gold to-amber-warm animated-gradient" />
       <div className="relative max-w-4xl mx-auto text-center text-black">
         <Reveal>
           <div className="text-xs uppercase tracking-[0.35em] font-medium mb-6 text-black/70">
-            Bereit für den nächsten Schritt?
+            {content?.label || "Bereit für den nächsten Schritt?"}
           </div>
           <h2 className="text-4xl sm:text-6xl lg:text-7xl font-display font-bold leading-[1.05] mb-10">
-            Lassen Sie uns über Ihr Unternehmen sprechen.
+            {content?.heading || "Lassen Sie uns über Ihr Unternehmen sprechen."}
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
@@ -975,7 +976,7 @@ export function KontaktCTA() {
 }
 
 /* ---------- CONTACTO ---------- */
-export function Contacto({ content }: { content: SiteContent["contact"] }) {
+export function Contacto({ content, heading }: { content: SiteContent["contact"]; heading?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
   return (
     <section id="contacto" className="pt-44 pb-32 px-6 bg-secondary/40">
@@ -983,7 +984,7 @@ export function Contacto({ content }: { content: SiteContent["contact"] }) {
         <Reveal>
           <SectionLabel>Kontakt</SectionLabel>
           <h1 className="text-4xl sm:text-6xl font-display font-bold leading-tight mb-8">
-            Sprechen wir über Ihren <span className="text-gradient-warm">nächsten Schritt</span>.
+            {heading || "Sprechen wir über Ihren nächsten Schritt."}
           </h1>
           <div className="space-y-5 text-muted-foreground">
             <ContactRow icon="📍" label={content.address} />

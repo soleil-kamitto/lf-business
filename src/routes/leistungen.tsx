@@ -20,12 +20,12 @@ function Leistungen() {
   return (
     <PageShell>
       <div className="pt-16">
-        <Consultorias content={content.consultorias} images={[content.images.consultoria1, content.images.consultoria2]} />
+        <Consultorias content={content.consultorias} heading={content.consultoriasHeading} images={[content.images.consultoria1, content.images.consultoria2]} />
       </div>
       <Servicios content={content.servicios} bannerImage={content.images.serviciosBanner} />
-      <Neuromarketing image={content.images.neuromarketing} />
+      <Neuromarketing image={content.images.neuromarketing} content={content.neuroContent} />
       <Branding content={content.branding} />
-      <KontaktCTA />
+      <KontaktCTA content={content.kontaktCta} />
     </PageShell>
   );
 }

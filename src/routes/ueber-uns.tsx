@@ -23,7 +23,7 @@ function UeberUns() {
         <About content={content.about} />
       </div>
       <Liza content={content.liza} portraitSrc={content.images.lizaPortrait} />
-      <KontaktCTA />
+      <KontaktCTA content={content.kontaktCta} />
     </PageShell>
   );
 }

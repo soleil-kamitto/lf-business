@@ -19,7 +19,7 @@ function Kontakt() {
   const content = Route.useLoaderData();
   return (
     <PageShell>
-      <Contacto content={content.contact} />
+      <Contacto content={content.contact} heading={content.contactoHeading} />
     </PageShell>
   );
 }
