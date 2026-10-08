@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Consultorias, Servicios, Neuromarketing, Branding, KontaktCTA } from "@/components/sections";
 import { getContent } from "@/lib/content";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/leistungen")({
   loader: () => getContent(),
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/leistungen")({
       { name: "description", content: "Digitales Marketing, Design, Werbung, Geschäftsstrategie, Kursdesign, Neuromarketing und Branding. Dazu KI und Software für Unternehmen im Appenzellerland." },
       { property: "og:title", content: "Leistungen | LF Marketing & Business Consulting" },
     ],
-    links: [{ rel: "canonical", href: "/leistungen" }],
+    links: [{ rel: "canonical", href: canonical("/leistungen") }],
   }),
   component: Leistungen,
 });

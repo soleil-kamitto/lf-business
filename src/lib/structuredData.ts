@@ -1,6 +1,5 @@
 import type { SiteContent } from "@/lib/content";
-
-const SITE_URL = "https://lf-business.vercel.app";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * Splits "Gfell 1002, 9053 Teufen, Schweiz" into schema.org PostalAddress parts.

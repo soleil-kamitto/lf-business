@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Hero, Marquee, LeistungenTeaser, Clientes, KontaktCTA } from "@/components/sections";
 import { getContent } from "@/lib/content";
 import { localBusinessJsonLd } from "@/lib/structuredData";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   loader: () => getContent(),
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "LF Marketing & Business Consulting" },
       { property: "og:description", content: "Gemeinsam stellen wir uns Ihr Unternehmen vor, inspirieren und gestalten es neu." },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: canonical("/") }],
   }),
   component: Index,
 });

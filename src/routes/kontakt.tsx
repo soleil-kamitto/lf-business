@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, Contacto } from "@/components/sections";
 import { getContent } from "@/lib/content";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/kontakt")({
   loader: () => getContent(),
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/kontakt")({
       { name: "description", content: "Kontaktieren Sie LF Marketing & Business Consulting in Teufen. Kostenlose Erstberatung für Unternehmen, Selbstständige und Gründer." },
       { property: "og:title", content: "Kontakt | LF Marketing & Business Consulting" },
     ],
-    links: [{ rel: "canonical", href: "/kontakt" }],
+    links: [{ rel: "canonical", href: canonical("/kontakt") }],
   }),
   component: Kontakt,
 });

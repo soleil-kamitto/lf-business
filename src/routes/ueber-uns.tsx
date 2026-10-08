@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, About, Liza, KontaktCTA } from "@/components/sections";
 import { getContent } from "@/lib/content";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/ueber-uns")({
   loader: () => getContent(),
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/ueber-uns")({
       { name: "description", content: "Lernen Sie LF Marketing & Business Consulting und Gründerin Liza Fässler kennen: internationale Unternehmerin und Strategin zwischen Lateinamerika und Europa." },
       { property: "og:title", content: "Über uns | LF Marketing & Business Consulting" },
     ],
-    links: [{ rel: "canonical", href: "/ueber-uns" }],
+    links: [{ rel: "canonical", href: canonical("/ueber-uns") }],
   }),
   component: UeberUns,
 });
