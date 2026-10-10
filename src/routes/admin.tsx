@@ -394,6 +394,11 @@ function AnalyticsPanel({ stats, onReload }: { stats: AnalyticsView | null; onRe
         {note && (
           <div style={{ ...S.hintBox, background: stats.status === "no-data" ? B.amberLight : "#fdecea", borderColor: stats.status === "no-data" ? `${B.amber}40` : "#f5c6c0" }}>
             {note}
+            {stats.message && stats.status !== "no-data" && (
+              <div style={{ marginTop: "0.4rem", fontSize: "0.68rem", color: B.muted, fontFamily: "ui-monospace, monospace", wordBreak: "break-all" }}>
+                {stats.message}
+              </div>
+            )}
           </div>
         )}
 

@@ -83,8 +83,12 @@ async function vercelQuery(params: Record<string, string>) {
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
 
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (res.status === 401 || res.status === 403) throw new Error("TOKEN_INVALID");
-  if (!res.ok) throw new Error(`VERCEL_${res.status}`);
+  if (!res.ok) {
+    // Vercel explains auth failures in the body (scope, team mismatch, expiry).
+    // Without it a 403 is indistinguishable from an expired token.
+    const detail = await res.text().catch(() => "");
+    throw new Error(`VERCEL_${res.status}: ${detail.slice(0, 300)}`);
+  }
   return (await res.json()) as { data?: Record<string, unknown>[] };
 }
 
@@ -171,10 +175,10 @@ export const getAnalytics = createServerFn({ method: "GET" }).handler(async (): 
     if (code === "NO_TOKEN") {
       return buildView(archive, "no-token", "VERCEL_API_TOKEN ist nicht gesetzt.");
     }
-    if (code === "TOKEN_INVALID") {
-      return buildView(archive, "token-invalid", "Der Vercel-Token ist abgelaufen oder ungültig.");
+    if (code.startsWith("VERCEL_401") || code.startsWith("VERCEL_403")) {
+      return buildView(archive, "token-invalid", code);
     }
-    return buildView(archive, "error", `Vercel meldet einen Fehler (${code}).`);
+    return buildView(archive, "error", code);
   }
 });
 
