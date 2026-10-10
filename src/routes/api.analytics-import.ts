@@ -7,9 +7,11 @@ export const Route = createFileRoute("/api/analytics-import")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const secret = process.env.CRON_SECRET;
-        const auth = request.headers.get("authorization");
-        if (secret && auth !== `Bearer ${secret}`) {
+        // Secrets set through a pipe or pasted into a dashboard field often carry
+        // a stray newline, which would silently reject every cron run.
+        const secret = process.env.CRON_SECRET?.trim();
+        const sent = request.headers.get("authorization")?.trim().replace(/^Bearer\s+/i, "");
+        if (secret && sent !== secret) {
           return new Response("Unauthorized", { status: 401 });
         }
 
