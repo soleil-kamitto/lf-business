@@ -3,6 +3,7 @@ import { put, list } from "@vercel/blob";
 import { requireAdmin } from "@/lib/adminAuth";
 
 export type SiteContent = {
+  published: boolean;
   hero: { badge: string; title: string; subtitle: string };
   about: {
     heading: string;
@@ -62,6 +63,7 @@ export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "neu
 export type ImageSlot = (typeof IMAGE_SLOTS)[number];
 
 export const defaultContent: SiteContent = {
+  published: true,
   hero: {
     badge: "Teufen, Schweiz",
     title: "Gemeinsam stellen wir uns Ihr Unternehmen vor, inspirieren und gestalten es neu",
@@ -190,7 +192,7 @@ export const defaultContent: SiteContent = {
 const BLOB_PATHNAME = "site-content.json";
 
 function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
-  if (!override) return base;
+  if (override === undefined) return base;
   if (Array.isArray(base)) return (override as unknown as T) ?? base;
   if (typeof base === "object" && base !== null) {
     const result: any = { ...base };
@@ -210,7 +212,12 @@ export const getContent = createServerFn({ method: "GET" }).handler(async (): Pr
     const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
     const found = blobs.find((b) => b.pathname === BLOB_PATHNAME);
     if (!found) return defaultContent;
-    const res = await fetch(found.url, { cache: "no-store" });
+    // Vercel Blob's CDN enforces a minimum ~60s edge cache regardless of
+    // cacheControlMaxAge, so a stable URL can serve a stale save for up to a
+    // minute. Busting with the blob's own upload timestamp forces a fresh
+    // fetch exactly when the content actually changed.
+    const bust = new Date(found.uploadedAt).getTime();
+    const res = await fetch(`${found.url}?v=${bust}`, { cache: "no-store" });
     if (!res.ok) return defaultContent;
     const stored = (await res.json()) as Partial<SiteContent>;
     return mergeDeep(defaultContent, stored);

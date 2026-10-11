@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,6 +13,23 @@ import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { getContent } from "../lib/content";
+import { checkAdminAuth } from "../lib/adminAuth";
+
+function MaintenanceComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          Wir aktualisieren gerade unsere Website.
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Bitte schauen Sie in Kürze wieder vorbei.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -74,6 +92,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: async () => {
+    const [content, auth] = await Promise.all([getContent(), checkAdminAuth()]);
+    return { content, authed: auth.authed };
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -120,11 +142,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { content, authed } = Route.useLoaderData();
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith("/admin");
+  // Logged-in admins (e.g. the live preview pane inside /admin) always see the
+  // real site, even while it's in maintenance mode for the public.
+  const showMaintenance = !content.published && !isAdmin && !authed;
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {showMaintenance ? <MaintenanceComponent /> : <Outlet />}
     </QueryClientProvider>
   );
 }

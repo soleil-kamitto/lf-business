@@ -75,6 +75,23 @@ function AdminPage() {
     }
   }
 
+  // Takes effect immediately (not gated behind "Änderungen speichern") since
+  // going into/out of maintenance is a one-click, time-sensitive action.
+  async function togglePublished() {
+    if (!content) return;
+    const next = { ...content, published: !content.published };
+    setContent(next);
+    setStatus("saving");
+    try {
+      await saveContent({ data: next });
+      setStatus("saved");
+      iframeRef.current?.contentWindow?.location.reload();
+      setTimeout(() => setStatus("idle"), 2500);
+    } catch {
+      setStatus("error");
+    }
+  }
+
   if (authed === null) return <div style={{ minHeight: "100vh", background: B.cream }} />;
 
   if (!authed) {
@@ -130,6 +147,23 @@ function AdminPage() {
           </nav>
         </div>
         <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
+          <button
+            onClick={togglePublished}
+            disabled={status === "saving"}
+            title={
+              content.published
+                ? "Website ist veröffentlicht – klicken, um den Wartungsmodus zu aktivieren"
+                : "Website ist im Wartungsmodus – klicken, um sie zu veröffentlichen"
+            }
+            style={{
+              ...S.ghostBtn,
+              color: content.published ? "#7ed4a0" : "#fbbf24",
+              borderColor: content.published ? "rgba(126,212,160,0.35)" : "rgba(251,191,36,0.4)",
+              fontWeight: 600,
+            }}
+          >
+            {content.published ? "● Veröffentlicht" : "● Wartungsmodus"}
+          </button>
           {tab === "inhalte" && (
             <>
               {status === "saved" && (
