@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { useSession } from "@tanstack/react-start/server";
 import { put, list } from "@vercel/blob";
-import { requireAdmin } from "@/lib/adminAuth";
+import { requireAdmin, SESSION_CONFIG } from "@/lib/adminAuth";
 
 export type SiteContent = {
   published: boolean;
@@ -191,6 +192,11 @@ export const defaultContent: SiteContent = {
 
 const BLOB_PATHNAME = "site-content.json";
 
+// The content blob has a fixed pathname and no random suffix, so its public URL
+// never changes. Reading that URL is a free Blob operation; list() is a billed
+// "advanced" one, and this runs on every page view.
+const CONTENT_URL = `https://vb02dmjvh7tv9bkr.public.blob.vercel-storage.com/${BLOB_PATHNAME}`;
+
 function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
   if (override === undefined) return base;
   if (Array.isArray(base)) return (override as unknown as T) ?? base;
@@ -207,19 +213,50 @@ function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
   return (override as unknown as T) ?? base;
 }
 
+async function isAdminRequest(): Promise<boolean> {
+  try {
+    const session = await useSession<{ authed?: boolean }>({
+      password: process.env.SESSION_SECRET!,
+      ...SESSION_CONFIG,
+    });
+    return !!session.data.authed;
+  } catch {
+    return false;
+  }
+}
+
+/** Always current, but costs one advanced Blob operation per call. */
+async function readViaList(): Promise<Partial<SiteContent> | null> {
+  const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
+  const found = blobs.find((b) => b.pathname === BLOB_PATHNAME);
+  if (!found) return null;
+  // Vercel Blob's CDN enforces a minimum ~60s edge cache regardless of
+  // cacheControlMaxAge, so busting with the blob's own upload timestamp is what
+  // makes a save visible immediately.
+  const bust = new Date(found.uploadedAt).getTime();
+  const res = await fetch(`${found.url}?v=${bust}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return (await res.json()) as Partial<SiteContent>;
+}
+
+/** Free, but can be up to one CDN cache window (~60s) behind the latest save. */
+async function readDirect(): Promise<Partial<SiteContent> | null> {
+  const res = await fetch(CONTENT_URL);
+  if (!res.ok) return null;
+  return (await res.json()) as Partial<SiteContent>;
+}
+
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<SiteContent> => {
   try {
-    const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
-    const found = blobs.find((b) => b.pathname === BLOB_PATHNAME);
-    if (!found) return defaultContent;
-    // Vercel Blob's CDN enforces a minimum ~60s edge cache regardless of
-    // cacheControlMaxAge, so a stable URL can serve a stale save for up to a
-    // minute. Busting with the blob's own upload timestamp forces a fresh
-    // fetch exactly when the content actually changed.
-    const bust = new Date(found.uploadedAt).getTime();
-    const res = await fetch(`${found.url}?v=${bust}`, { cache: "no-store" });
-    if (!res.ok) return defaultContent;
-    const stored = (await res.json()) as Partial<SiteContent>;
+    // Admins — including the preview pane inside /admin, which carries the same
+    // session cookie — must see a save straight away. Visitors can be a cache
+    // window behind, which keeps page views off the billed operation quota.
+    const stored = (await isAdminRequest())
+      ? await readViaList()
+      : // Falling back keeps the site rendering if the fixed URL ever stops
+        // resolving, at the cost of one operation.
+        ((await readDirect()) ?? (await readViaList()));
+    if (!stored) return defaultContent;
     return mergeDeep(defaultContent, stored);
   } catch (err) {
     console.error("getContent failed, falling back to defaults", err);

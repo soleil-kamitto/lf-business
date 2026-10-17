@@ -3,7 +3,7 @@ import { useSession } from "@tanstack/react-start/server";
 
 type AdminSessionData = { authed?: boolean };
 
-const SESSION_CONFIG = {
+export const SESSION_CONFIG = {
   name: "lf_admin_session",
   maxAge: 60 * 60 * 24 * 30,
 };
