@@ -594,6 +594,10 @@ function ImageField({ label, slot, value, onChange }: { label: string; slot: Ima
     }
   }
 
+  // Three states, not two: a custom image, the built-in default, or none at all.
+  // Liza asked to be able to clear the default too, so "" means "show nothing".
+  const removed = value === "";
+
   return (
     <div style={{ marginBottom: "1rem" }}>
       <span style={S.label}>{label}</span>
@@ -603,7 +607,7 @@ function ImageField({ label, slot, value, onChange }: { label: string; slot: Ima
             <img src={value} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", fontSize: "0.6rem", color: B.muted, textAlign: "center", padding: 4 }}>
-              Standardbild
+              {removed ? "Kein Bild" : "Standardbild"}
             </div>
           )}
         </div>
@@ -613,11 +617,19 @@ function ImageField({ label, slot, value, onChange }: { label: string; slot: Ima
             {status === "uploading" ? "Lädt hoch…" : value ? "Bild ersetzen" : "Bild hochladen"}
             <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0])} disabled={status === "uploading"} style={{ display: "none" }} />
           </label>
-          {value && (
+          {removed ? (
+            <button
+              onClick={() => onChange(null)}
+              style={{ ...S.ghostBtnLight, marginLeft: "0.5rem" }}
+            >
+              Standardbild zurückholen
+            </button>
+          ) : (
             <button
               onClick={() => {
-                if (window.confirm(`"${label}" wirklich entfernen? Es erscheint dann wieder das Standardbild.`)) {
-                  onChange(null);
+                const back = value ? "Es erscheint dann wieder das Standardbild." : "An dieser Stelle erscheint dann kein Bild mehr.";
+                if (window.confirm(`"${label}" wirklich entfernen? ${back}`)) {
+                  onChange(value ? null : "");
                 }
               }}
               title="Bild entfernen"

@@ -420,6 +420,7 @@ export function Counter({ to, suffix = "", label }: { to: number; suffix?: strin
 export function LizaPortrait({ src }: { src?: string | null }) {
   const ref = useRef<HTMLDivElement>(null);
   const [t, setT] = useState({ rx: 0, ry: 0 });
+  if (!pick(src, lizaEscribiendo)) return null;
   return (
     <div className="w-full max-w-sm sm:max-w-md mx-auto">
       <motion.div
@@ -437,7 +438,7 @@ export function LizaPortrait({ src }: { src?: string | null }) {
         className="relative aspect-[4/5] rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/25 bg-card group"
       >
         <img
-          src={src || lizaEscribiendo}
+          src={pick(src, lizaEscribiendo) ?? lizaEscribiendo}
           alt="Liza Fässler bei der strategischen Planung"
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-700 ease-out"
           width={1280}
@@ -452,6 +453,11 @@ export function LizaPortrait({ src }: { src?: string | null }) {
     </div>
   );
 }
+
+// An empty string means Liza removed the picture on purpose, so fall back to the
+// bundled default only when nothing was ever chosen (null/undefined).
+export const pick = (value: string | null | undefined, fallback: string) =>
+  value === "" ? null : (value ?? fallback);
 
 // Clearing every field of a card in /admin is how Liza deletes it. Without this
 // the emptied card still renders as a blank box.
@@ -541,7 +547,7 @@ export function Consultorias({
   heading?: string;
   images?: (string | null)[];
 }) {
-  const items = filled(content).map((it, i) => ({ ...it, img: images?.[i] || CONSULTORIAS_IMAGES[i] }));
+  const items = filled(content).map((it, i) => ({ ...it, img: pick(images?.[i], CONSULTORIAS_IMAGES[i]) }));
   return (
     <section id="consultorias" className="py-32 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -555,14 +561,14 @@ export function Consultorias({
             <Reveal key={it.title} delay={i * 0.15}>
               <Card3D>
                 <div className="relative h-[480px] rounded-3xl overflow-hidden bg-foreground group">
-                  <img
+                  {it.img && <img
                     src={it.img}
                     alt={it.title}
                     loading="lazy"
                     width={1200}
                     height={1400}
                     className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-[1.2s] ease-out"
-                  />
+                  />}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
                   <div className="shine-sweep rounded-3xl" />
                   <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
@@ -647,11 +653,11 @@ export function Neuromarketing({ image, content }: { image?: string | null; cont
               {content?.description || "Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden."}
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className={pick(image, neuroImg) ? "" : "hidden"}>
             <Card3D>
               <div className="relative aspect-square rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/10 group">
                 <motion.img
-                  src={image || neuroImg}
+                  src={pick(image, neuroImg) ?? neuroImg}
                   alt="Neuromarketing"
                   loading="lazy"
                   width={1400}
@@ -811,7 +817,9 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
 
         <Reveal>
           <div className="relative rounded-3xl overflow-hidden">
-            <img src={bannerImage || servicesImg} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" />
+            {pick(bannerImage, servicesImg) && (
+              <img src={pick(bannerImage, servicesImg)!} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" />
+            )}
             <div className="relative min-h-72 bg-gradient-to-r from-black/75 via-black/40 to-transparent flex items-center px-6 sm:px-10 py-10">
               <div className="text-white max-w-xl">
                 <h3 className="text-3xl font-display font-bold mb-3">{content.bannerHeading || "Bereit zu wachsen?"}</h3>
