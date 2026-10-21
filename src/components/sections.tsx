@@ -18,6 +18,11 @@ import logoFullWhite from "@/assets/logo-full-white.png";
 import logoFullDark from "@/assets/logo-full-dark.png";
 import lizaEscribiendo from "@/assets/liza/liza_escribiendo.jpg";
 import videoAi from "@/assets/video-ai.mp4";
+// The hero plays this purely as a darkened background loop, so it is encoded
+// small (720p, no audio): it loads for every visitor and bandwidth is the
+// tightest budget on the plan. The full-quality file above is only fetched when
+// someone actually presses play further down the page.
+import videoAiHero from "@/assets/video-ai-hero.mp4";
 import marcasDoTempoImg from "@/assets/brands/marcas-do-tempo.jpeg";
 import miniMintweltImg from "@/assets/brands/minimintwelt.jpeg";
 import puraVidaImg from "@/assets/brands/pura-vida.jpeg";
@@ -210,7 +215,7 @@ export function Hero({ content }: { content: SiteContent["hero"] }) {
       className="relative min-h-screen flex items-center overflow-hidden bg-black"
     >
       <video
-        src={videoAi}
+        src={videoAiHero}
         autoPlay
         muted
         loop
@@ -448,8 +453,14 @@ export function LizaPortrait({ src }: { src?: string | null }) {
   );
 }
 
+// Clearing every field of a card in /admin is how Liza deletes it. Without this
+// the emptied card still renders as a blank box.
+export const filled = <T extends object>(items: T[] = []) =>
+  items.filter((it) => Object.values(it).some((v) => typeof v === "string" && v.trim() !== ""));
+
 export function Liza({ content, portraitSrc }: { content: SiteContent["liza"]; portraitSrc?: string | null }) {
-  const { expertise, journey } = content;
+  const expertise = filled(content.expertise);
+  const journey = filled(content.journey);
   return (
     <section id="liza" className="py-32 px-6 bg-secondary/40 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -530,7 +541,7 @@ export function Consultorias({
   heading?: string;
   images?: (string | null)[];
 }) {
-  const items = content.map((it, i) => ({ ...it, img: images?.[i] || CONSULTORIAS_IMAGES[i] }));
+  const items = filled(content).map((it, i) => ({ ...it, img: images?.[i] || CONSULTORIAS_IMAGES[i] }));
   return (
     <section id="consultorias" className="py-32 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -664,7 +675,7 @@ export function Neuromarketing({ image, content }: { image?: string | null; cont
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {cards.map((c, i) => (
+          {filled(cards).map((c, i) => (
             <Reveal key={c.title} delay={i * 0.1}>
               <motion.div
                 whileHover={{ y: -10, rotateX: 6, rotateY: -3, scale: 1.02 }}
@@ -696,7 +707,7 @@ export function Neuromarketing({ image, content }: { image?: string | null; cont
 export function ServiceCards({ services }: { services: SiteContent["servicios"]["services"] }) {
   return (
     <div className="grid md:grid-cols-3 gap-6">
-      {services.map((it, i) => (
+      {filled(services).map((it, i) => (
         <Reveal key={it.title} delay={i * 0.1}>
           <motion.div
             whileHover={{ y: -12, rotateX: 3 }}
@@ -778,7 +789,7 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
             <h3 className="text-2xl sm:text-4xl font-display font-bold"><Highlight text={content.spezialHeading || "Beratung, die über Marketing hinausgeht."} /></h3>
           </Reveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {content.spezial.map((it, i) => (
+            {filled(content.spezial).map((it, i) => (
               <Reveal key={it.title} delay={i * 0.1} className="h-full">
                 <motion.div
                   whileHover={{ y: -10, scale: 1.02 }}
