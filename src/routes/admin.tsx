@@ -573,7 +573,7 @@ function SubGroupLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ImageField({ label, slot, value, onChange }: { label: string; slot: ImageSlot; value: string | null; onChange: (url: string) => void }) {
+function ImageField({ label, slot, value, onChange }: { label: string; slot: ImageSlot; value: string | null; onChange: (url: string | null) => void }) {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -608,10 +608,25 @@ function ImageField({ label, slot, value, onChange }: { label: string; slot: Ima
           )}
         </div>
         <div>
-          <label style={{ ...S.ghostBtn, display: "inline-block", cursor: "pointer" }}>
+          {/* ghostBtn is white-on-dark for the header; on this white card it was invisible. */}
+          <label style={{ ...S.ghostBtnLight, display: "inline-block", cursor: "pointer" }}>
             {status === "uploading" ? "Lädt hoch…" : value ? "Bild ersetzen" : "Bild hochladen"}
             <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0])} disabled={status === "uploading"} style={{ display: "none" }} />
           </label>
+          {value && (
+            <button
+              onClick={() => {
+                if (window.confirm(`"${label}" wirklich entfernen? Es erscheint dann wieder das Standardbild.`)) {
+                  onChange(null);
+                }
+              }}
+              title="Bild entfernen"
+              aria-label={`${label} entfernen`}
+              style={{ ...S.ghostBtnLight, marginLeft: "0.5rem", color: B.error, borderColor: "#f5c6c0" }}
+            >
+              🗑 Entfernen
+            </button>
+          )}
           {errorMsg && <p style={{ color: B.error, fontSize: "0.8rem", marginTop: "0.4rem" }}>{errorMsg}</p>}
         </div>
       </div>
