@@ -190,7 +190,12 @@ function AdminPage() {
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         {/* Left: website iframe */}
-        <div style={{ width: "50%", flexShrink: 0, borderRight: `1px solid ${B.border}`, background: B.dark, position: "relative" }}>
+        {/* On a phone two half-width panes are unusable, so the preview drops
+            away and the editor takes the full screen. */}
+        <div
+          className="hidden lg:block"
+          style={{ width: "50%", flexShrink: 0, borderRight: `1px solid ${B.border}`, background: B.dark, position: "relative" }}
+        >
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 1, padding: "0.45rem 0.75rem", background: "rgba(21,21,28,0.85)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.15em" }}>Vorschau</span>
             <span style={{ flex: 1, fontSize: "0.7rem", color: "rgba(255,255,255,0.25)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -299,8 +304,6 @@ function AdminPage() {
             </EditorSection>
 
             <EditorSection title="Leistungen">
-              <ImageField label="Bild Neuromarketing" slot="neuromarketing" value={content.images.neuromarketing}
-                onChange={(url) => setContent({ ...content, images: { ...content.images, neuromarketing: url } })} />
               <ImageField label={`Banner-Bild ("Bereit zu wachsen?")`} slot="serviciosBanner" value={content.images.serviciosBanner}
                 onChange={(url) => setContent({ ...content, images: { ...content.images, serviciosBanner: url } })} />
               <Field label="Überschrift" value={content.servicios.heading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, heading: v } })} preview="heading" />
@@ -309,6 +312,19 @@ function AdminPage() {
               <SubGroupLabel>Kernleistungen</SubGroupLabel>
               {content.servicios.services.map((s, i) => (
                 <div key={i} style={S.subCard}>
+                  {i < 3 && (
+                    <ImageField
+                      label="Hintergrundbild (erscheint beim Darüberfahren)"
+                      slot={(["service1", "service2", "service3"] as const)[i]}
+                      value={content.images[(["service1", "service2", "service3"] as const)[i]]}
+                      onChange={(url) =>
+                        setContent({
+                          ...content,
+                          images: { ...content.images, [(["service1", "service2", "service3"] as const)[i]]: url },
+                        })
+                      }
+                    />
+                  )}
                   <Field label="Titel" value={s.title}
                     onChange={(v) => { const services = [...content.servicios.services]; services[i] = { ...services[i], title: v }; setContent({ ...content, servicios: { ...content.servicios, services } }); }}
                     preview="card-title" />
@@ -322,6 +338,19 @@ function AdminPage() {
               <Field label="Überschrift Spezialgebiete" value={content.servicios.spezialHeading || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, spezialHeading: v } })} preview="heading" />
               {content.servicios.spezial.map((s, i) => (
                 <div key={i} style={S.subCard}>
+                  {i < 4 && (
+                    <ImageField
+                      label="Hintergrundbild (erscheint beim Darüberfahren)"
+                      slot={(["spezial1", "spezial2", "spezial3", "spezial4"] as const)[i]}
+                      value={content.images[(["spezial1", "spezial2", "spezial3", "spezial4"] as const)[i]]}
+                      onChange={(url) =>
+                        setContent({
+                          ...content,
+                          images: { ...content.images, [(["spezial1", "spezial2", "spezial3", "spezial4"] as const)[i]]: url },
+                        })
+                      }
+                    />
+                  )}
                   <Field label="Titel" value={s.title}
                     onChange={(v) => { const spezial = [...content.servicios.spezial]; spezial[i] = { ...spezial[i], title: v }; setContent({ ...content, servicios: { ...content.servicios, spezial } }); }}
                     preview="card-title" />
@@ -333,22 +362,6 @@ function AdminPage() {
               <SubGroupLabel>Banner ("Bereit zu wachsen?")</SubGroupLabel>
               <Field label="Überschrift Banner" value={content.servicios.bannerHeading || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, bannerHeading: v } })} preview="card-title" />
               <Field label="Text Banner" value={content.servicios.bannerText || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, bannerText: v } })} textarea preview="card-text" />
-            </EditorSection>
-
-            <EditorSection title="Neuromarketing">
-              <Field label="Überschrift" value={content.neuroContent?.heading || ""} onChange={(v) => setContent({ ...content, neuroContent: { ...content.neuroContent!, heading: v } })} textarea preview="heading" />
-              <Field label="Beschreibung" value={content.neuroContent?.description || ""} onChange={(v) => setContent({ ...content, neuroContent: { ...content.neuroContent!, description: v } })} textarea preview="body-light" />
-              <SubGroupLabel>Karten</SubGroupLabel>
-              {(content.neuroContent?.cards || []).map((c, i) => (
-                <div key={i} style={S.subCard}>
-                  <Field label="Titel" value={c.title}
-                    onChange={(v) => { const cards = [...(content.neuroContent?.cards || [])]; cards[i] = { ...cards[i], title: v }; setContent({ ...content, neuroContent: { ...content.neuroContent!, cards } }); }}
-                    preview="card-title" />
-                  <Field label="Text" value={c.text}
-                    onChange={(v) => { const cards = [...(content.neuroContent?.cards || [])]; cards[i] = { ...cards[i], text: v }; setContent({ ...content, neuroContent: { ...content.neuroContent!, cards } }); }}
-                    textarea preview="card-text" />
-                </div>
-              ))}
             </EditorSection>
 
             <EditorSection title="KI & Software">
@@ -363,6 +376,7 @@ function AdminPage() {
 
             <EditorSection title="Kunden & Partner">
               <Field label="Überschrift" value={content.clientesHeading || ""} onChange={(v) => setContent({ ...content, clientesHeading: v })} preview="heading" />
+              <Field label="Text" value={content.clientesText || ""} onChange={(v) => setContent({ ...content, clientesText: v })} textarea preview="body-light" />
             </EditorSection>
 
             <EditorSection title="Startseite – Leistungen-Teaser">

@@ -15,6 +15,7 @@ import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as LeistungenRouteImport } from './routes/leistungen'
 import { Route as UeberUnsRouteImport } from './routes/ueber-uns'
 import { Route as ApiAnalyticsImportRouteImport } from './routes/api.analytics-import'
+import { Route as ApiMediaSplatRouteImport } from './routes/api.media.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const ApiAnalyticsImportRoute = ApiAnalyticsImportRouteImport.update({
   path: '/api/analytics-import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMediaSplatRoute = ApiMediaSplatRouteImport.update({
+  id: '/api/media/$',
+  path: '/api/media/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/leistungen': typeof LeistungenRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/api/analytics-import': typeof ApiAnalyticsImportRoute
+  '/api/media/$': typeof ApiMediaSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/leistungen': typeof LeistungenRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/api/analytics-import': typeof ApiAnalyticsImportRoute
+  '/api/media/$': typeof ApiMediaSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/leistungen': typeof LeistungenRoute
   '/ueber-uns': typeof UeberUnsRoute
   '/api/analytics-import': typeof ApiAnalyticsImportRoute
+  '/api/media/$': typeof ApiMediaSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/leistungen'
     | '/ueber-uns'
     | '/api/analytics-import'
+    | '/api/media/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/leistungen'
     | '/ueber-uns'
     | '/api/analytics-import'
+    | '/api/media/$'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/leistungen'
     | '/ueber-uns'
     | '/api/analytics-import'
+    | '/api/media/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   LeistungenRoute: typeof LeistungenRoute
   UeberUnsRoute: typeof UeberUnsRoute
   ApiAnalyticsImportRoute: typeof ApiAnalyticsImportRoute
+  ApiMediaSplatRoute: typeof ApiMediaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAnalyticsImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/media/$': {
+      id: '/api/media/$'
+      path: '/api/media/$'
+      fullPath: '/api/media/$'
+      preLoaderRoute: typeof ApiMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeistungenRoute: LeistungenRoute,
   UeberUnsRoute: UeberUnsRoute,
   ApiAnalyticsImportRoute: ApiAnalyticsImportRoute,
+  ApiMediaSplatRoute: ApiMediaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

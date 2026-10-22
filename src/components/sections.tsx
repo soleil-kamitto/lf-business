@@ -10,10 +10,21 @@ import {
   useInView,
   animate,
 } from "framer-motion";
-import gruenderImg from "@/assets/gruender-desk.jpg";
-import kleinunternehmenImg from "@/assets/kleinunternehmen-tools.jpg";
-import neuroImg from "@/assets/neuro.jpg";
+import gruenderImg from "@/assets/cards/gruender.jpg";
+import kleinunternehmenImg from "@/assets/cards/kleinunternehmen.jpg";
 import servicesImg from "@/assets/services.jpg";
+import cardMarketing from "@/assets/cards/marketing.jpg";
+import cardDesign from "@/assets/cards/design.jpg";
+import cardWerbung from "@/assets/cards/werbung.jpg";
+import cardStrategie from "@/assets/cards/strategie.jpg";
+import cardKursdesign from "@/assets/cards/kursdesign.jpg";
+import cardKonzept from "@/assets/cards/konzept.jpg";
+import cardMeeting from "@/assets/cards/meeting.jpg";
+import cardPinnwand from "@/assets/cards/pinnwand.jpg";
+
+// Defaults behind the hover effect; Liza can replace or clear each from /admin.
+const SERVICE_CARD_IMAGES = [cardMarketing, cardDesign, cardWerbung];
+const SPEZIAL_CARD_IMAGES = [cardStrategie, cardKursdesign, cardKonzept, cardMeeting, cardPinnwand];
 import logoFullWhite from "@/assets/logo-full-white.png";
 import logoFullDark from "@/assets/logo-full-dark.png";
 import lizaEscribiendo from "@/assets/liza/liza_escribiendo.jpg";
@@ -372,14 +383,15 @@ export function About({ content }: { content: SiteContent["about"] }) {
     <section id="about" className="py-32 px-6 bg-background">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
         <Reveal className="lg:col-span-5">
-          <SectionLabel>Über uns</SectionLabel>
+          <SectionLabel>Über mich</SectionLabel>
           <h2 className="text-4xl sm:text-5xl font-display font-bold leading-tight">
             <Highlight text={content.heading} />
           </h2>
         </Reveal>
         <Reveal delay={0.15} className="lg:col-span-7 text-muted-foreground text-lg leading-relaxed space-y-5">
-          <p>{content.paragraph1}</p>
-          <p>{content.paragraph2}</p>
+          {/* whitespace-pre-line so a line break typed in /admin shows on the page. */}
+          <p className="whitespace-pre-line"><Highlight text={content.paragraph1} /></p>
+          <p className="whitespace-pre-line"><Highlight text={content.paragraph2} /></p>
           <div className="grid grid-cols-3 gap-6 pt-6">
             {(content.counters || []).map((c, i) => (
               <Counter key={i} to={c.value} suffix={c.suffix} label={c.label} />
@@ -482,8 +494,8 @@ export function Liza({ content, portraitSrc }: { content: SiteContent["liza"]; p
               </p>
             </Reveal>
             <Reveal delay={0.15}>
-              <p className="mt-8 text-muted-foreground text-lg leading-relaxed">{content.bio1}</p>
-              <p className="mt-5 text-muted-foreground text-lg leading-relaxed">{content.bio2}</p>
+              <p className="mt-8 text-muted-foreground text-lg leading-relaxed whitespace-pre-line"><Highlight text={content.bio1} /></p>
+              <p className="mt-5 text-muted-foreground text-lg leading-relaxed whitespace-pre-line"><Highlight text={content.bio2} /></p>
             </Reveal>
             <div className="mt-10 space-y-0">
               {journey.map((j, i) => (
@@ -514,13 +526,15 @@ export function Liza({ content, portraitSrc }: { content: SiteContent["liza"]; p
           </div>
         </div>
 
-        <div className="mt-20 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Flex-wrap, not a grid: Liza can delete cards, and a short last row
+            should stay centred instead of hugging the left edge. */}
+        <div className="mt-20 flex flex-wrap justify-center gap-5">
           {expertise.map((e, i) => (
-            <Reveal key={e.title} delay={i * 0.1} className="h-full">
+            <Reveal key={e.title} delay={i * 0.1} className="flex w-full md:w-[calc(33.333%-1rem)]">
               <motion.div
                 whileHover={{ y: -10, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                className="relative h-full p-7 rounded-2xl bg-card border border-border hover:border-amber-warm/50 shadow-sm hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500 group overflow-hidden"
+                className="relative w-full p-7 rounded-2xl bg-card border border-border hover:border-amber-warm/50 shadow-sm hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500 group overflow-hidden"
               >
                 <div className="shine-sweep rounded-2xl" />
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
@@ -556,18 +570,20 @@ export function Consultorias({
           <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={heading || "Wir begleiten jede Phase."} /></h2>
         </Reveal>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {items.map((it, i) => (
-            <Reveal key={it.title} delay={i * 0.15}>
+            <Reveal key={it.title} delay={i * 0.15} className="w-full md:w-[calc(50%-1rem)]">
               <Card3D>
-                <div className="relative h-[480px] rounded-3xl overflow-hidden bg-foreground group">
+                {/* aspect ratio instead of a fixed height: the photo keeps its
+                    proportions at every width, and object-top stops heads being cut. */}
+                <div className="relative aspect-[4/5] sm:aspect-[3/4] rounded-3xl overflow-hidden bg-foreground group">
                   {it.img && <img
                     src={it.img}
                     alt={it.title}
                     loading="lazy"
                     width={1200}
                     height={1400}
-                    className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-[1.2s] ease-out"
+                    className="absolute inset-0 w-full h-full object-cover object-top opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1.2s] ease-out"
                   />}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
                   <div className="shine-sweep rounded-3xl" />
@@ -632,102 +648,41 @@ export function Marquee() {
   );
 }
 
-/* ---------- NEUROMARKETING ---------- */
-export function Neuromarketing({ image, content }: { image?: string | null; content?: SiteContent["neuroContent"] }) {
-  const cards = content?.cards || [
-    { title: "Social Media", text: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
-    { title: "Design", text: "Gestalten Sie wie eine Fachperson. Nutzen Sie Neuromarketing, das Blicke einfängt und Verkäufe abschliesst." },
-    { title: "Kommunikation", text: "Kommunizieren Sie empathisch und überzeugend, um Menschen wirklich zu erreichen." },
-    { title: "Marketing", text: "Erkennen Sie die digitalen und klassischen Strategien, die Ihre Marke zum Erfolg führen." },
-  ];
-  return (
-    <section id="neuromarketing" className="relative py-32 px-6 bg-background overflow-hidden">
-      <div className="relative max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
-          <Reveal>
-            <SectionLabel>Neuromarketing</SectionLabel>
-            <h2 className="text-4xl sm:text-6xl font-display font-bold leading-tight">
-              <Highlight text={content?.heading || "Wie *Neurowissenschaft* und Design Konsumenten beeinflussen."} />
-            </h2>
-            <p className="mt-6 text-muted-foreground text-lg max-w-lg">
-              {content?.description || "Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden."}
-            </p>
-          </Reveal>
-          <Reveal delay={0.2} className={pick(image, neuroImg) ? "" : "hidden"}>
-            <Card3D>
-              <div className="relative aspect-square rounded-3xl overflow-hidden border border-border shadow-2xl shadow-amber-warm/10 group">
-                <motion.img
-                  src={pick(image, neuroImg) ?? neuroImg}
-                  alt="Neuromarketing"
-                  loading="lazy"
-                  width={1400}
-                  height={1200}
-                  initial={{ scale: 1.3 }}
-                  whileInView={{ scale: 1 }}
-                  transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-                  viewport={{ once: true }}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/35 via-transparent to-amber-warm/10" />
-                <motion.div
-                  animate={{ opacity: [0.3, 0.7, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute inset-0 pointer-events-none mix-blend-overlay"
-                  style={{ background: "radial-gradient(circle at 50% 50%, oklch(0.82 0.15 75 / 0.5), transparent 60%)" }}
-                />
-              </div>
-            </Card3D>
-          </Reveal>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {filled(cards).map((c, i) => (
-            <Reveal key={c.title} delay={i * 0.1}>
-              <motion.div
-                whileHover={{ y: -10, rotateX: 6, rotateY: -3, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                className="relative h-full p-6 rounded-2xl bg-card border border-border hover:border-amber-warm/60 shadow-sm hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500 group overflow-hidden"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <div className="shine-sweep rounded-2xl" />
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  className="w-10 h-10 rounded-lg grid place-items-center bg-amber-warm/15 text-amber-warm font-display font-bold mb-4"
-                >
-                  0{i + 1}
-                </motion.div>
-                <h3 className="font-display font-semibold text-xl mb-2">{c.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{c.text}</p>
-              </motion.div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ---------- SERVICE CARDS (shared home + leistungen) ---------- */
-export function ServiceCards({ services }: { services: SiteContent["servicios"]["services"] }) {
+export function ServiceCards({ services, images }: { services: SiteContent["servicios"]["services"]; images?: (string | null)[] }) {
   return (
-    <div className="grid md:grid-cols-3 gap-6">
-      {filled(services).map((it, i) => (
-        <Reveal key={it.title} delay={i * 0.1}>
+    <div className="flex flex-wrap justify-center gap-6">
+      {filled(services).map((it, i) => {
+        const bg = pick(images?.[i], SERVICE_CARD_IMAGES[i] ?? "");
+        return (
+        <Reveal key={it.title} delay={i * 0.1} className="w-full md:w-[calc(33.333%-1rem)]">
           <motion.div
             whileHover={{ y: -12, rotateX: 3 }}
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
             style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-            className="relative h-72 p-7 rounded-2xl bg-card border border-border overflow-hidden group hover:border-amber-warm/50 hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500"
+            className="relative min-h-72 p-7 rounded-2xl bg-card border border-border overflow-hidden group hover:border-amber-warm/50 hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500"
           >
+            {/* Optional photo that fades in on hover; text stays readable via the scrim. */}
+            {bg && (
+              <>
+                <img
+                  src={bg}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-card/85 group-hover:bg-black/55 transition-colors duration-700" />
+              </>
+            )}
             <div className="shine-sweep rounded-2xl" />
-            <div className="text-6xl font-display font-bold text-muted/70 group-hover:text-amber-warm transition-colors">
+            <div className={`relative text-6xl font-display font-bold transition-colors ${bg ? "text-muted/70 group-hover:text-white" : "text-muted/70 group-hover:text-amber-warm"}`}>
               0{i + 1}
             </div>
-            <div className="absolute bottom-7 left-7 right-7">
-              <h3 className="text-2xl font-display font-bold mb-2 capitalize">{it.title}</h3>
-              <p className="text-muted-foreground text-sm">{it.text}</p>
+            {/* Anchored to a fixed line, not to the card bottom, so the titles of
+                all three cards sit at the same height regardless of text length. */}
+            <div className="relative mt-6 md:mt-0 md:absolute md:top-32 md:left-7 md:right-7">
+              <h3 className={`text-2xl font-display font-bold mb-2 capitalize transition-colors ${bg ? "group-hover:text-white" : ""}`}>{it.title}</h3>
+              <p className={`text-sm transition-colors ${bg ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}>{it.text}</p>
             </div>
             <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -735,13 +690,14 @@ export function ServiceCards({ services }: { services: SiteContent["servicios"][
             </div>
           </motion.div>
         </Reveal>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
 /* ---------- LEISTUNGEN TEASER (home) ---------- */
-export function LeistungenTeaser({ services, content }: { services: SiteContent["servicios"]["services"]; content?: SiteContent["leistungenTeaser"] }) {
+export function LeistungenTeaser({ services, content, images }: { services: SiteContent["servicios"]["services"]; content?: SiteContent["leistungenTeaser"]; images?: (string | null)[] }) {
   return (
     <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
@@ -755,7 +711,7 @@ export function LeistungenTeaser({ services, content }: { services: SiteContent[
           </Reveal>
         </div>
 
-        <ServiceCards services={services} />
+        <ServiceCards services={services} images={images} />
 
         <Reveal className="mt-14 text-center">
           <MagneticButton href="/leistungen" primary>
@@ -768,7 +724,7 @@ export function LeistungenTeaser({ services, content }: { services: SiteContent[
 }
 
 /* ---------- SERVICIOS (full, leistungen page) ---------- */
-export function Servicios({ content, bannerImage }: { content: SiteContent["servicios"]; bannerImage?: string | null }) {
+export function Servicios({ content, bannerImage, images, spezialImages }: { content: SiteContent["servicios"]; bannerImage?: string | null; images?: (string | null)[]; spezialImages?: (string | null)[] }) {
   return (
     <section id="servicios" className="py-32 px-6 bg-secondary/40">
       <div className="max-w-7xl mx-auto">
@@ -783,7 +739,7 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
         </div>
 
         <div className="mb-16">
-          <ServiceCards services={content.services} />
+          <ServiceCards services={content.services} images={images} />
         </div>
 
         <div className="mb-16">
@@ -794,21 +750,32 @@ export function Servicios({ content, bannerImage }: { content: SiteContent["serv
             </div>
             <h3 className="text-2xl sm:text-4xl font-display font-bold"><Highlight text={content.spezialHeading || "Beratung, die über Marketing hinausgeht."} /></h3>
           </Reveal>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="flex flex-wrap justify-center gap-6">
             {filled(content.spezial).map((it, i) => (
-              <Reveal key={it.title} delay={i * 0.1} className="h-full">
+              <Reveal key={it.title} delay={i * 0.1} className="flex w-full md:w-[calc(33.333%-1rem)]">
                 <motion.div
                   whileHover={{ y: -10, scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                  className="relative h-full p-6 rounded-2xl bg-card border border-border hover:border-amber-warm/50 shadow-sm hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500 group overflow-hidden"
+                  className="relative w-full min-h-72 p-7 rounded-2xl bg-card border border-border hover:border-amber-warm/50 shadow-sm hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500 group overflow-hidden"
                 >
+                  {pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") && (
+                    <>
+                      <img
+                        src={pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "")!}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-card/85 group-hover:bg-black/55 transition-colors duration-700" />
+                    </>
+                  )}
                   <div className="shine-sweep rounded-2xl" />
                   <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
-                  <div className="w-10 h-10 rounded-lg grid place-items-center bg-amber-warm/15 text-amber-warm font-display font-bold mb-4">
+                  <div className="relative w-10 h-10 rounded-lg grid place-items-center bg-amber-warm/15 text-amber-warm font-display font-bold mb-4">
                     0{i + 4}
                   </div>
-                  <h4 className="font-display font-semibold text-lg mb-2">{it.title}</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{it.text}</p>
+                  <h4 className={`relative font-display font-semibold text-lg mb-2 transition-colors ${pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") ? "group-hover:text-white" : ""}`}>{it.title}</h4>
+                  <p className={`relative text-sm leading-relaxed transition-colors ${pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}>{it.text}</p>
                 </motion.div>
               </Reveal>
             ))}
@@ -899,7 +866,7 @@ export function Branding({ content }: { content: SiteContent["branding"] }) {
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
-          <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">{content.paragraph}</p>
+          <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto whitespace-pre-line"><Highlight text={content.paragraph} /></p>
         </Reveal>
       </div>
     </section>
@@ -907,7 +874,7 @@ export function Branding({ content }: { content: SiteContent["branding"] }) {
 }
 
 /* ---------- CLIENTES ---------- */
-export function Clientes({ heading }: { heading?: string }) {
+export function Clientes({ heading, text }: { heading?: string; text?: string }) {
   const brands = [
     {
       key: "minimint",
@@ -935,8 +902,9 @@ export function Clientes({ heading }: { heading?: string }) {
     <section id="clientes" className="py-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <Reveal>
-          <SectionLabel>Kunden & Partner</SectionLabel>
+          <SectionLabel>Kunden, Partner & Referenzen</SectionLabel>
           <h2 className="text-4xl sm:text-5xl font-display font-bold"><Highlight text={heading || "Marken, die uns bereits vertrauen."} /></h2>
+          {text && <p className="mt-5 text-muted-foreground text-lg leading-relaxed max-w-3xl">{text}</p>}
         </Reveal>
       </div>
       <div className="relative">
@@ -972,7 +940,7 @@ export function KontaktCTA({ content }: { content?: SiteContent["kontaktCta"] })
       <div className="relative max-w-4xl mx-auto text-center text-black">
         <Reveal>
           <div className="text-xs uppercase tracking-[0.35em] font-medium mb-6 text-black/70">
-            {content?.label || "Bereit für den nächsten Schritt?"}
+            <Highlight text={content?.label || "Bereit für den nächsten Schritt?"} />
           </div>
           <h2 className="text-4xl sm:text-6xl lg:text-7xl font-display font-bold leading-[1.05] mb-10">
             {content?.heading || "Lassen Sie uns über Ihr Unternehmen sprechen."}
@@ -986,7 +954,7 @@ export function KontaktCTA({ content }: { content?: SiteContent["kontaktCta"] })
             transition={{ type: "spring", stiffness: 260, damping: 18 }}
             className="inline-flex items-center gap-3 rounded-full bg-black text-white px-10 py-5 text-lg font-medium shimmer shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] group"
           >
-            Kontaktieren Sie uns
+            Lassen Sie uns sprechen
             <span className="transition-transform group-hover:translate-x-1.5">→</span>
           </motion.a>
         </Reveal>

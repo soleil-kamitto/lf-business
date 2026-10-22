@@ -27,8 +27,12 @@ function Index() {
     <PageShell>
       <Hero content={content.hero} />
       <Marquee />
-      <LeistungenTeaser services={content.servicios.services} content={content.leistungenTeaser} />
-      <Clientes heading={content.clientesHeading} />
+      <LeistungenTeaser
+        services={content.servicios.services}
+        content={content.leistungenTeaser}
+        images={[content.images.service1, content.images.service2, content.images.service3]}
+      />
+      <Clientes heading={content.clientesHeading} text={content.clientesText} />
       <KontaktCTA content={content.kontaktCta} />
     </PageShell>
   );

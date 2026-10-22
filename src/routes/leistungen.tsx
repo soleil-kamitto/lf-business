@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell, Consultorias, Servicios, Neuromarketing, Branding, KontaktCTA } from "@/components/sections";
+import { PageShell, Consultorias, Servicios, Branding, KontaktCTA } from "@/components/sections";
 import { getContent } from "@/lib/content";
 import { canonical } from "@/lib/site";
 
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/leistungen")({
   head: () => ({
     meta: [
       { title: "Leistungen | LF Marketing & Business Consulting" },
-      { name: "description", content: "Digitales Marketing, Design, Werbung, Geschäftsstrategie, Kursdesign, Neuromarketing und Branding. Dazu KI und Software für Unternehmen im Appenzellerland." },
+      { name: "description", content: "Digitales Marketing, Design, Werbung, Geschäftsstrategie, Kursdesign und Branding. Dazu KI und Software für Unternehmen im Appenzellerland." },
       { property: "og:title", content: "Leistungen | LF Marketing & Business Consulting" },
     ],
     links: [{ rel: "canonical", href: canonical("/leistungen") }],
@@ -23,8 +23,12 @@ function Leistungen() {
       <div className="pt-16">
         <Consultorias content={content.consultorias} heading={content.consultoriasHeading} images={[content.images.consultoria1, content.images.consultoria2]} />
       </div>
-      <Servicios content={content.servicios} bannerImage={content.images.serviciosBanner} />
-      <Neuromarketing image={content.images.neuromarketing} content={content.neuroContent} />
+      <Servicios
+        content={content.servicios}
+        bannerImage={content.images.serviciosBanner}
+        images={[content.images.service1, content.images.service2, content.images.service3]}
+        spezialImages={[content.images.spezial1, content.images.spezial2, content.images.spezial3, content.images.spezial4]}
+      />
       <Branding content={content.branding} />
       <KontaktCTA content={content.kontaktCta} />
     </PageShell>

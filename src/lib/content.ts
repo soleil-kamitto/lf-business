@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { useSession } from "@tanstack/react-start/server";
-import { put, list } from "@vercel/blob";
-import { requireAdmin, SESSION_CONFIG } from "@/lib/adminAuth";
+import { getJson, putJson, putObject, publicUrl } from "@/lib/storage";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export type SiteContent = {
   published: boolean;
@@ -40,6 +39,7 @@ export type SiteContent = {
     description: string;
   };
   clientesHeading: string;
+  clientesText: string;
   leistungenTeaser: {
     heading: string;
     description: string;
@@ -57,10 +57,17 @@ export type SiteContent = {
     consultoria2: string | null;
     neuromarketing: string | null;
     serviciosBanner: string | null;
+    service1: string | null;
+    service2: string | null;
+    service3: string | null;
+    spezial1: string | null;
+    spezial2: string | null;
+    spezial3: string | null;
+    spezial4: string | null;
   };
 };
 
-export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "neuromarketing", "serviciosBanner"] as const;
+export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "neuromarketing", "serviciosBanner", "service1", "service2", "service3", "spezial1", "spezial2", "spezial3", "spezial4"] as const;
 export type ImageSlot = (typeof IMAGE_SLOTS)[number];
 
 export const defaultContent: SiteContent = {
@@ -162,6 +169,8 @@ export const defaultContent: SiteContent = {
     description: "Wir bringen künstliche Intelligenz und moderne Software zu Unternehmen in Appenzell und der Ostschweiz. Sehen Sie im Video, wie wir Ideen mit Technologie verbinden.",
   },
   clientesHeading: "Marken, die uns bereits vertrauen.",
+  clientesText:
+    "Ich unterstütze Unternehmen dabei, ihre Identität sichtbar zu machen – von der Logoentwicklung bis zur individuellen Marketing- und Kommunikationslösung.",
   leistungenTeaser: {
     heading: "Alles, was Ihre Marke braucht.",
     description: "Von digitalem Marketing bis Geschäftsstrategie: integrierte Lösungen für nachhaltiges Wachstum.",
@@ -187,15 +196,17 @@ export const defaultContent: SiteContent = {
     consultoria2: null,
     neuromarketing: null,
     serviciosBanner: null,
+    service1: null,
+    service2: null,
+    service3: null,
+    spezial1: null,
+    spezial2: null,
+    spezial3: null,
+    spezial4: null,
   },
 };
 
-const BLOB_PATHNAME = "site-content.json";
-
-// The content blob has a fixed pathname and no random suffix, so its public URL
-// never changes. Reading that URL is a free Blob operation; list() is a billed
-// "advanced" one, and this runs on every page view.
-const CONTENT_URL = `https://vb02dmjvh7tv9bkr.public.blob.vercel-storage.com/${BLOB_PATHNAME}`;
+const CONTENT_KEY = "site-content.json";
 
 function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
   if (override === undefined) return base;
@@ -213,49 +224,11 @@ function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
   return (override as unknown as T) ?? base;
 }
 
-async function isAdminRequest(): Promise<boolean> {
-  try {
-    const session = await useSession<{ authed?: boolean }>({
-      password: process.env.SESSION_SECRET!,
-      ...SESSION_CONFIG,
-    });
-    return !!session.data.authed;
-  } catch {
-    return false;
-  }
-}
-
-/** Always current, but costs one advanced Blob operation per call. */
-async function readViaList(): Promise<Partial<SiteContent> | null> {
-  const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
-  const found = blobs.find((b) => b.pathname === BLOB_PATHNAME);
-  if (!found) return null;
-  // Vercel Blob's CDN enforces a minimum ~60s edge cache regardless of
-  // cacheControlMaxAge, so busting with the blob's own upload timestamp is what
-  // makes a save visible immediately.
-  const bust = new Date(found.uploadedAt).getTime();
-  const res = await fetch(`${found.url}?v=${bust}`, { cache: "no-store" });
-  if (!res.ok) return null;
-  return (await res.json()) as Partial<SiteContent>;
-}
-
-/** Free, but can be up to one CDN cache window (~60s) behind the latest save. */
-async function readDirect(): Promise<Partial<SiteContent> | null> {
-  const res = await fetch(CONTENT_URL);
-  if (!res.ok) return null;
-  return (await res.json()) as Partial<SiteContent>;
-}
-
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<SiteContent> => {
   try {
-    // Admins — including the preview pane inside /admin, which carries the same
-    // session cookie — must see a save straight away. Visitors can be a cache
-    // window behind, which keeps page views off the billed operation quota.
-    const stored = (await isAdminRequest())
-      ? await readViaList()
-      : // Falling back keeps the site rendering if the fixed URL ever stops
-        // resolving, at the cost of one operation.
-        ((await readDirect()) ?? (await readViaList()));
+    // R2 reads are authenticated and uncached, so a save is visible on the very
+    // next request — no admin/visitor split and no cache busting needed.
+    const stored = await getJson<Partial<SiteContent>>(CONTENT_KEY);
     if (!stored) return defaultContent;
     return mergeDeep(defaultContent, stored);
   } catch (err) {
@@ -268,13 +241,7 @@ export const saveContent = createServerFn({ method: "POST" })
   .validator((data: SiteContent) => data)
   .handler(async ({ data }) => {
     await requireAdmin();
-    await put(BLOB_PATHNAME, JSON.stringify(data, null, 2), {
-      access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      contentType: "application/json",
-      cacheControlMaxAge: 0,
-    });
+    await putJson(CONTENT_KEY, data);
     return { ok: true };
   });
 
@@ -292,9 +259,7 @@ export const uploadImage = createServerFn({ method: "POST" })
     if (file.size > MAX_IMAGE_BYTES) throw new Error("Bild ist zu gross (max. 8 MB).");
 
     const ext = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
-    const blob = await put(`images/${slot}-${Date.now()}.${ext}`, file, {
-      access: "public",
-      contentType: file.type,
-    });
-    return { url: blob.url };
+    const key = `images/${slot}-${Date.now()}.${ext}`;
+    await putObject(key, await file.arrayBuffer(), file.type);
+    return { url: publicUrl(key) };
   });
