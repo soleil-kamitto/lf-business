@@ -29,11 +29,6 @@ export type SiteContent = {
     bannerHeading: string;
     bannerText: string;
   };
-  neuroContent: {
-    heading: string;
-    description: string;
-    cards: { title: string; text: string }[];
-  };
   kiContent: {
     heading: string;
     description: string;
@@ -51,11 +46,12 @@ export type SiteContent = {
   contactoHeading: string;
   branding: { heading: string; paragraph: string };
   contact: { address: string; email: string; phone: string };
+  /** CSS object-position per image slot, so Liza can reframe a crop herself. */
+  imagePositions: Record<string, string>;
   images: {
     lizaPortrait: string | null;
     consultoria1: string | null;
     consultoria2: string | null;
-    neuromarketing: string | null;
     serviciosBanner: string | null;
     service1: string | null;
     service2: string | null;
@@ -67,7 +63,7 @@ export type SiteContent = {
   };
 };
 
-export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "neuromarketing", "serviciosBanner", "service1", "service2", "service3", "spezial1", "spezial2", "spezial3", "spezial4"] as const;
+export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "serviciosBanner", "service1", "service2", "service3", "spezial1", "spezial2", "spezial3", "spezial4"] as const;
 export type ImageSlot = (typeof IMAGE_SLOTS)[number];
 
 export const defaultContent: SiteContent = {
@@ -76,14 +72,14 @@ export const defaultContent: SiteContent = {
     badge: "Teufen, Schweiz",
     title: "Gemeinsam stellen wir uns Ihr Unternehmen vor, inspirieren und gestalten es neu",
     subtitle:
-      "Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice, digitales Marketing, Branding und Neuromarketing, damit sich Ihr Unternehmen wirklich abhebt.",
+      "Kostenlose Beratung für Unternehmer. Wir kümmern uns um Kundenservice, digitales Marketing und Branding, damit sich Ihr Unternehmen wirklich abhebt.",
   },
   about: {
     heading: "Von der Idee bis zur Positionierung - Strategie, Marketing und Kommunikation *aus einer Hand*.",
     paragraph1:
       "Bei LF Marketing & Business Consulting helfen wir bestehenden und zukünftigen Unternehmen, ihren Kundenservice zu verbessern und sich von anderen Anbietern abzuheben.",
     paragraph2:
-      "Wir verbinden strategische Beratung, digitales Marketing, Branding und Neuromarketing, um Unternehmen mit eigener Identität, menschlichem Fokus und messbaren Ergebnissen aufzubauen.",
+      "Wir verbinden strategische Beratung, digitales Marketing und Branding, um Unternehmen mit eigener Identität, menschlichem Fokus und messbaren Ergebnissen aufzubauen.",
     counters: [
       { value: 10, suffix: "+", label: "Jahre Erfahrung" },
       { value: 60, suffix: "+", label: "Begleitete Marken" },
@@ -154,16 +150,6 @@ export const defaultContent: SiteContent = {
       },
     ],
   },
-  neuroContent: {
-    heading: "Wie *Neurowissenschaft* und Design Konsumenten beeinflussen.",
-    description: "Steigern Sie die Bindung Ihrer Marke mit Techniken, die emotional und kognitiv verbinden.",
-    cards: [
-      { title: "Social Media", text: "Erkennen Sie Ihr Kundenprofil und entdecken Sie, wie man in sozialen Netzwerken verkauft." },
-      { title: "Design", text: "Gestalten Sie wie eine Fachperson. Nutzen Sie Neuromarketing, das Blicke einfängt und Verkäufe abschliesst." },
-      { title: "Kommunikation", text: "Kommunizieren Sie empathisch und überzeugend, um Menschen wirklich zu erreichen." },
-      { title: "Marketing", text: "Erkennen Sie die digitalen und klassischen Strategien, die Ihre Marke zum Erfolg führen." },
-    ],
-  },
   kiContent: {
     heading: "Die *digitale Zukunft* für Unternehmen im Appenzellerland.",
     description: "Wir bringen künstliche Intelligenz und moderne Software zu Unternehmen in Appenzell und der Ostschweiz. Sehen Sie im Video, wie wir Ideen mit Technologie verbinden.",
@@ -190,11 +176,11 @@ export const defaultContent: SiteContent = {
     email: "info@lf-business-consulting.com",
     phone: "+41 77 471 70 06",
   },
+  imagePositions: {},
   images: {
     lizaPortrait: null,
     consultoria1: null,
     consultoria2: null,
-    neuromarketing: null,
     serviciosBanner: null,
     service1: null,
     service2: null,

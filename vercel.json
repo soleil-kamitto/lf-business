@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/analytics-import",
-      "schedule": "0 3 * * *"
-    }
-  ]
-}

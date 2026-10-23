@@ -127,6 +127,12 @@ function AdminPage() {
 
   const siteOrigin = typeof window !== "undefined" ? window.location.origin : "";
 
+  const focus = (slot: ImageSlot) => ({
+    position: content.imagePositions?.[slot],
+    onPosition: (p: string) =>
+      setContent({ ...content, imagePositions: { ...content.imagePositions, [slot]: p } }),
+  });
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* ── Header ── */}
@@ -255,7 +261,7 @@ function AdminPage() {
             </EditorSection>
 
             <EditorSection title="Liza Fässler">
-              <ImageField label="Foto von Liza" slot="lizaPortrait" value={content.images.lizaPortrait}
+              <ImageField {...focus("lizaPortrait")} label="Foto von Liza" slot="lizaPortrait" value={content.images.lizaPortrait}
                 onChange={(url) => setContent({ ...content, images: { ...content.images, lizaPortrait: url } })} />
               <Field label="Unterzeile" value={content.liza.subheading} onChange={(v) => setContent({ ...content, liza: { ...content.liza, subheading: v } })} preview="eyebrow" />
               <Field label="Biografie, Absatz 1" value={content.liza.bio1} onChange={(v) => setContent({ ...content, liza: { ...content.liza, bio1: v } })} textarea preview="body-light" />
@@ -290,7 +296,7 @@ function AdminPage() {
               <Field label="Überschrift" value={content.consultoriasHeading || ""} onChange={(v) => setContent({ ...content, consultoriasHeading: v })} textarea preview="heading" />
               {content.consultorias.map((c, i) => (
                 <div key={i} style={S.subCard}>
-                  <ImageField label={`Bild Karte ${i + 1}`} slot={i === 0 ? "consultoria1" : "consultoria2"}
+                  <ImageField {...focus(i === 0 ? "consultoria1" : "consultoria2")} label={`Bild Karte ${i + 1}`} slot={i === 0 ? "consultoria1" : "consultoria2"}
                     value={i === 0 ? content.images.consultoria1 : content.images.consultoria2}
                     onChange={(url) => setContent({ ...content, images: { ...content.images, [i === 0 ? "consultoria1" : "consultoria2"]: url } })} />
                   <Field label="Titel" value={c.title}
@@ -304,7 +310,7 @@ function AdminPage() {
             </EditorSection>
 
             <EditorSection title="Leistungen">
-              <ImageField label={`Banner-Bild ("Bereit zu wachsen?")`} slot="serviciosBanner" value={content.images.serviciosBanner}
+              <ImageField {...focus("serviciosBanner")} label={`Banner-Bild ("Bereit zu wachsen?")`} slot="serviciosBanner" value={content.images.serviciosBanner}
                 onChange={(url) => setContent({ ...content, images: { ...content.images, serviciosBanner: url } })} />
               <Field label="Überschrift" value={content.servicios.heading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, heading: v } })} preview="heading" />
               <Field label="Unterzeile" value={content.servicios.subheading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, subheading: v } })} textarea preview="body-light" />
@@ -316,6 +322,7 @@ function AdminPage() {
                     <ImageField
                       label="Hintergrundbild (erscheint beim Darüberfahren)"
                       slot={(["service1", "service2", "service3"] as const)[i]}
+                      {...focus((["service1", "service2", "service3"] as const)[i])}
                       value={content.images[(["service1", "service2", "service3"] as const)[i]]}
                       onChange={(url) =>
                         setContent({
@@ -342,6 +349,7 @@ function AdminPage() {
                     <ImageField
                       label="Hintergrundbild (erscheint beim Darüberfahren)"
                       slot={(["spezial1", "spezial2", "spezial3", "spezial4"] as const)[i]}
+                      {...focus((["spezial1", "spezial2", "spezial3", "spezial4"] as const)[i])}
                       value={content.images[(["spezial1", "spezial2", "spezial3", "spezial4"] as const)[i]]}
                       onChange={(url) =>
                         setContent({
@@ -587,7 +595,15 @@ function SubGroupLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ImageField({ label, slot, value, onChange }: { label: string; slot: ImageSlot; value: string | null; onChange: (url: string | null) => void }) {
+// A photo is cropped to fill its card, so the interesting part can fall outside.
+// These nine presets move the visible window without touching the file.
+const FOCUS = [
+  ["links oben", "left top"], ["oben", "center top"], ["rechts oben", "right top"],
+  ["links", "left center"], ["Mitte", "center center"], ["rechts", "right center"],
+  ["links unten", "left bottom"], ["unten", "center bottom"], ["rechts unten", "right bottom"],
+] as const;
+
+function ImageField({ label, slot, value, onChange, position, onPosition }: { label: string; slot: ImageSlot; value: string | null; onChange: (url: string | null) => void; position?: string; onPosition?: (p: string) => void }) {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -654,6 +670,29 @@ function ImageField({ label, slot, value, onChange }: { label: string; slot: Ima
             </button>
           )}
           {errorMsg && <p style={{ color: B.error, fontSize: "0.8rem", marginTop: "0.4rem" }}>{errorMsg}</p>}
+          {onPosition && !removed && (
+            <div style={{ marginTop: "0.6rem" }}>
+              <span style={{ ...S.label, display: "block", marginBottom: "0.3rem" }}>Bildausschnitt</span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 26px)", gap: 3 }}>
+                {FOCUS.map(([title, pos]) => {
+                  const active = (position || "center center") === pos;
+                  return (
+                    <button
+                      key={pos}
+                      onClick={() => onPosition(pos)}
+                      title={title}
+                      aria-label={title}
+                      style={{
+                        width: 26, height: 26, borderRadius: 5, cursor: "pointer",
+                        border: `1px solid ${active ? B.amber : B.border}`,
+                        background: active ? B.amber : B.white,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

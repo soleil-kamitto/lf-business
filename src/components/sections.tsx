@@ -429,7 +429,7 @@ export function Counter({ to, suffix = "", label }: { to: number; suffix?: strin
 }
 
 /* ---------- LIZA FÄSSLER ---------- */
-export function LizaPortrait({ src }: { src?: string | null }) {
+export function LizaPortrait({ src, position }: { src?: string | null; position?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [t, setT] = useState({ rx: 0, ry: 0 });
   if (!pick(src, lizaEscribiendo)) return null;
@@ -451,6 +451,7 @@ export function LizaPortrait({ src }: { src?: string | null }) {
       >
         <img
           src={pick(src, lizaEscribiendo) ?? lizaEscribiendo}
+          style={{ objectPosition: position || "center center" }}
           alt="Liza Fässler bei der strategischen Planung"
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-700 ease-out"
           width={1280}
@@ -476,7 +477,7 @@ export const pick = (value: string | null | undefined, fallback: string) =>
 export const filled = <T extends object>(items: T[] = []) =>
   items.filter((it) => Object.values(it).some((v) => typeof v === "string" && v.trim() !== ""));
 
-export function Liza({ content, portraitSrc }: { content: SiteContent["liza"]; portraitSrc?: string | null }) {
+export function Liza({ content, portraitSrc, portraitPosition }: { content: SiteContent["liza"]; portraitSrc?: string | null; portraitPosition?: string }) {
   const expertise = filled(content.expertise);
   const journey = filled(content.journey);
   return (
@@ -521,7 +522,7 @@ export function Liza({ content, portraitSrc }: { content: SiteContent["liza"]; p
 
           <div className="lg:col-span-6">
             <Reveal delay={0.2}>
-              <LizaPortrait src={portraitSrc} />
+              <LizaPortrait src={portraitSrc} position={portraitPosition} />
             </Reveal>
           </div>
         </div>
@@ -556,12 +557,14 @@ export function Consultorias({
   content,
   heading,
   images,
+  positions,
 }: {
   content: SiteContent["consultorias"];
   heading?: string;
   images?: (string | null)[];
+  positions?: (string | undefined)[];
 }) {
-  const items = filled(content).map((it, i) => ({ ...it, img: pick(images?.[i], CONSULTORIAS_IMAGES[i]) }));
+  const items = filled(content).map((it, i) => ({ ...it, img: pick(images?.[i], CONSULTORIAS_IMAGES[i]), pos: positions?.[i] }));
   return (
     <section id="consultorias" className="py-32 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -583,7 +586,8 @@ export function Consultorias({
                     loading="lazy"
                     width={1200}
                     height={1400}
-                    className="absolute inset-0 w-full h-full object-cover object-top opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1.2s] ease-out"
+                    className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1.2s] ease-out"
+                    style={{ objectPosition: it.pos || "center top" }}
                   />}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
                   <div className="shine-sweep rounded-3xl" />
@@ -629,7 +633,7 @@ export function Card3D({ children }: { children: ReactNode }) {
 
 /* ---------- MARQUEE TEXT BAND ---------- */
 export function Marquee() {
-  const words = ["Strategie", "•", "Branding", "•", "Neuromarketing", "•", "Design", "•", "Werbung", "•", "Wachstum", "•"];
+  const words = ["Strategie", "•", "Branding", "•", "Design", "•", "Werbung", "•", "Wachstum", "•"];
   const row = [...words, ...words, ...words];
   return (
     <section className="py-12 bg-cream overflow-hidden border-y border-border">
@@ -649,7 +653,7 @@ export function Marquee() {
 }
 
 /* ---------- SERVICE CARDS (shared home + leistungen) ---------- */
-export function ServiceCards({ services, images }: { services: SiteContent["servicios"]["services"]; images?: (string | null)[] }) {
+export function ServiceCards({ services, images, positions }: { services: SiteContent["servicios"]["services"]; images?: (string | null)[]; positions?: (string | undefined)[] }) {
   return (
     <div className="flex flex-wrap justify-center gap-6">
       {filled(services).map((it, i) => {
@@ -667,6 +671,7 @@ export function ServiceCards({ services, images }: { services: SiteContent["serv
               <>
                 <img
                   src={bg}
+                  style={{ objectPosition: positions?.[i] || "center center" }}
                   alt=""
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
@@ -697,7 +702,7 @@ export function ServiceCards({ services, images }: { services: SiteContent["serv
 }
 
 /* ---------- LEISTUNGEN TEASER (home) ---------- */
-export function LeistungenTeaser({ services, content, images }: { services: SiteContent["servicios"]["services"]; content?: SiteContent["leistungenTeaser"]; images?: (string | null)[] }) {
+export function LeistungenTeaser({ services, content, images, positions }: { services: SiteContent["servicios"]["services"]; content?: SiteContent["leistungenTeaser"]; images?: (string | null)[]; positions?: (string | undefined)[] }) {
   return (
     <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
@@ -711,7 +716,7 @@ export function LeistungenTeaser({ services, content, images }: { services: Site
           </Reveal>
         </div>
 
-        <ServiceCards services={services} images={images} />
+        <ServiceCards services={services} images={images} positions={positions} />
 
         <Reveal className="mt-14 text-center">
           <MagneticButton href="/leistungen" primary>
@@ -724,7 +729,7 @@ export function LeistungenTeaser({ services, content, images }: { services: Site
 }
 
 /* ---------- SERVICIOS (full, leistungen page) ---------- */
-export function Servicios({ content, bannerImage, images, spezialImages }: { content: SiteContent["servicios"]; bannerImage?: string | null; images?: (string | null)[]; spezialImages?: (string | null)[] }) {
+export function Servicios({ content, bannerImage, images, spezialImages, positions, spezialPositions, bannerPosition }: { content: SiteContent["servicios"]; bannerImage?: string | null; images?: (string | null)[]; spezialImages?: (string | null)[]; positions?: (string | undefined)[]; spezialPositions?: (string | undefined)[]; bannerPosition?: string }) {
   return (
     <section id="servicios" className="py-32 px-6 bg-secondary/40">
       <div className="max-w-7xl mx-auto">
@@ -739,7 +744,7 @@ export function Servicios({ content, bannerImage, images, spezialImages }: { con
         </div>
 
         <div className="mb-16">
-          <ServiceCards services={content.services} images={images} />
+          <ServiceCards services={content.services} images={images} positions={positions} />
         </div>
 
         <div className="mb-16">
@@ -762,6 +767,7 @@ export function Servicios({ content, bannerImage, images, spezialImages }: { con
                     <>
                       <img
                         src={pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "")!}
+                        style={{ objectPosition: spezialPositions?.[i] || "center center" }}
                         alt=""
                         loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover opacity-0 scale-105 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
@@ -785,7 +791,7 @@ export function Servicios({ content, bannerImage, images, spezialImages }: { con
         <Reveal>
           <div className="relative rounded-3xl overflow-hidden">
             {pick(bannerImage, servicesImg) && (
-              <img src={pick(bannerImage, servicesImg)!} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={pick(bannerImage, servicesImg)!} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: bannerPosition || "center center" }} />
             )}
             <div className="relative min-h-72 bg-gradient-to-r from-black/75 via-black/40 to-transparent flex items-center px-6 sm:px-10 py-10">
               <div className="text-white max-w-xl">

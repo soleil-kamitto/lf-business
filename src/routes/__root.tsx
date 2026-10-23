@@ -9,7 +9,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -101,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "LF Marketing & Business Consulting" },
-      { name: "description", content: "Kostenlose Beratung für Unternehmerinnen und Unternehmer. Wir unterstützen Sie bei Kundenservice, digitalem Marketing, Branding und Neuromarketing. Aus Teufen in der Schweiz." },
+      { name: "description", content: "Kostenlose Beratung für Unternehmerinnen und Unternehmer. Wir unterstützen Sie bei Kundenservice, digitalem Marketing und Branding. Aus Teufen in der Schweiz." },
       { name: "author", content: "LF Marketing & Business Consulting" },
       { property: "og:title", content: "LF Marketing & Business Consulting" },
       { property: "og:description", content: "Gemeinsam stellen wir uns Ihr Unternehmen vor, inspirieren und gestalten es neu." },
@@ -133,7 +132,6 @@ function RootShell({ children }: { children: ReactNode }) {
       <body>
         {children}
         {/* Liza's own visits to her editor would otherwise show up as site traffic. */}
-        <Analytics beforeSend={(event) => (event.url.includes("/admin") ? null : event)} />
         <Scripts />
       </body>
     </html>

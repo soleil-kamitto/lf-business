@@ -7,6 +7,9 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // Was Cloudflare (the config's default). Netlify lets the domain and Liza's
+  // paid mailbox stay on Wix DNS, which Cloudflare Workers would have forced off.
+  nitro: { preset: "netlify" },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

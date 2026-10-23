@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { put, list } from "@vercel/blob";
+import { getJson, putJson } from "@/lib/storage";
 import { requireAdmin } from "@/lib/adminAuth";
 
 // Vercel only guarantees a 30-day reporting window on the current plan, so every
 // run copies the recent days into our own archive. The archive is what the admin
 // panel reads, which also keeps the panel working if the Vercel API is down.
-const BLOB_PATHNAME = "analytics-history.json";
+const ARCHIVE_KEY = "analytics-history.json";
 
 // Re-pulling days we already have corrects figures Vercel revises late, and costs
 // nothing because days are keyed by date.
@@ -52,25 +52,16 @@ function ymd(d: Date) {
 
 async function readArchive(): Promise<AnalyticsArchive> {
   try {
-    const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
-    const found = blobs.find((b) => b.pathname === BLOB_PATHNAME);
-    if (!found) return emptyArchive;
-    const res = await fetch(found.url, { cache: "no-store" });
-    if (!res.ok) return emptyArchive;
-    return { ...emptyArchive, ...((await res.json()) as Partial<AnalyticsArchive>) };
+    const stored = await getJson<Partial<AnalyticsArchive>>(ARCHIVE_KEY);
+    if (!stored) return emptyArchive;
+    return { ...emptyArchive, ...stored };
   } catch {
     return emptyArchive;
   }
 }
 
 async function writeArchive(archive: AnalyticsArchive) {
-  await put(BLOB_PATHNAME, JSON.stringify(archive), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json",
-    cacheControlMaxAge: 0,
-  });
+  await putJson(ARCHIVE_KEY, archive);
 }
 
 async function vercelQuery(params: Record<string, string>) {
