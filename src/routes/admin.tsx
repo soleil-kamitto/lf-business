@@ -347,6 +347,7 @@ function AdminPage() {
 
             <EditorSection title="Beratung (Consultorias)">
               <Field label="Überschrift" value={content.consultoriasHeading || ""} onChange={(v) => setContent({ ...content, consultoriasHeading: v })} textarea preview="heading" />
+              <Field label="Untertitel" value={content.consultoriasText || ""} onChange={(v) => setContent({ ...content, consultoriasText: v })} preview="body-light" />
               {content.consultorias.map((c, i) => (
                 <div key={i} style={S.subCard}>
                   <ImageField {...focus(i === 0 ? "consultoria1" : "consultoria2")} label={`Bild Karte ${i + 1}`} slot={i === 0 ? "consultoria1" : "consultoria2"}
@@ -455,6 +456,8 @@ function AdminPage() {
               <Field label="Adresse" value={content.contact.address} onChange={(v) => setContent({ ...content, contact: { ...content.contact, address: v } })} preview="small" />
               <Field label="E-Mail" value={content.contact.email} onChange={(v) => setContent({ ...content, contact: { ...content.contact, email: v } })} preview="small" />
               <Field label="Telefon" value={content.contact.phone} onChange={(v) => setContent({ ...content, contact: { ...content.contact, phone: v } })} preview="small" />
+              <Field label="Instagram-Link (leer lassen = Symbol ausblenden)" value={content.contact.instagram || ""} onChange={(v) => setContent({ ...content, contact: { ...content.contact, instagram: v } })} preview="small" />
+              <Field label="LinkedIn-Link (leer lassen = Symbol ausblenden)" value={content.contact.linkedin || ""} onChange={(v) => setContent({ ...content, contact: { ...content.contact, linkedin: v } })} preview="small" />
             </EditorSection>
 
             <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "0.5rem" }}>

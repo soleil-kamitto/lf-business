@@ -21,7 +21,7 @@ function Leistungen() {
   return (
     <PageShell>
       <div className="pt-16">
-        <Consultorias content={content.consultorias} heading={content.consultoriasHeading} images={[content.images.consultoria1, content.images.consultoria2]} positions={[content.imagePositions?.consultoria1, content.imagePositions?.consultoria2]} />
+        <Consultorias content={content.consultorias} heading={content.consultoriasHeading} text={content.consultoriasText} images={[content.images.consultoria1, content.images.consultoria2]} positions={[content.imagePositions?.consultoria1, content.imagePositions?.consultoria2]} />
       </div>
       <Servicios
         content={content.servicios}

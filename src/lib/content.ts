@@ -20,6 +20,7 @@ export type SiteContent = {
   };
   consultorias: { title: string; phrase: string }[];
   consultoriasHeading: string;
+  consultoriasText: string;
   servicios: {
     heading: string;
     subheading: string;
@@ -45,7 +46,7 @@ export type SiteContent = {
   };
   contactoHeading: string;
   branding: { heading: string; paragraph: string };
-  contact: { address: string; email: string; phone: string };
+  contact: { address: string; email: string; phone: string; instagram: string; linkedin: string };
   /** CSS object-position per image slot, so Liza can reframe a crop herself. */
   imagePositions: Record<string, string>;
   images: {
@@ -118,6 +119,7 @@ export const defaultContent: SiteContent = {
     ],
   },
   consultoriasHeading: "Wir begleiten jede Phase.",
+  consultoriasText: "Personal, Strategisch und praxisnah.",
   consultorias: [
     {
       title: "Gründer & Selbstständige",
@@ -175,6 +177,8 @@ export const defaultContent: SiteContent = {
     address: "Gfell 1002, 9053 Teufen, Schweiz",
     email: "info@lf-business-consulting.com",
     phone: "+41 77 471 70 06",
+    instagram: "",
+    linkedin: "",
   },
   imagePositions: {},
   images: {

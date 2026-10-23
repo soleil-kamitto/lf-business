@@ -556,11 +556,13 @@ const CONSULTORIAS_IMAGES = [gruenderImg, kleinunternehmenImg];
 export function Consultorias({
   content,
   heading,
+  text,
   images,
   positions,
 }: {
   content: SiteContent["consultorias"];
   heading?: string;
+  text?: string;
   images?: (string | null)[];
   positions?: (string | undefined)[];
 }) {
@@ -571,6 +573,11 @@ export function Consultorias({
         <Reveal className="text-center mb-16">
           <SectionLabel>Beratung</SectionLabel>
           <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={heading || "Wir begleiten jede Phase."} /></h2>
+          {text && (
+            <p className="mt-4 text-muted-foreground text-lg leading-relaxed whitespace-pre-line">
+              <Highlight text={text} />
+            </p>
+          )}
         </Reveal>
 
         <div className="flex flex-wrap justify-center gap-8">
@@ -986,11 +993,24 @@ export function Contacto({ content, heading }: { content: SiteContent["contact"]
             <ContactRow icon="☎" label={content.phone} href={`tel:${content.phone.replace(/\s+/g, "")}`} />
           </div>
           <div className="flex gap-3 mt-10">
-            {[{ n: "IG", u: "#" }, { n: "in", u: "#" }].map((s) => (
-              <a key={s.n} href={s.u} className="w-11 h-11 rounded-full border border-border grid place-items-center text-sm hover:bg-foreground hover:text-background hover:scale-110 transition-all">
-                {s.n}
-              </a>
-            ))}
+            {/* An empty field hides its icon, so no button leads nowhere. */}
+            {[
+              { n: "IG", u: content.instagram, label: "Instagram" },
+              { n: "in", u: content.linkedin, label: "LinkedIn" },
+            ]
+              .filter((s) => s.u?.trim())
+              .map((s) => (
+                <a
+                  key={s.n}
+                  href={s.u}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="w-11 h-11 rounded-full border border-border grid place-items-center text-sm hover:bg-foreground hover:text-background hover:scale-110 transition-all"
+                >
+                  {s.n}
+                </a>
+              ))}
           </div>
         </Reveal>
 
