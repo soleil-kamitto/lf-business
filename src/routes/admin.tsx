@@ -13,6 +13,10 @@ export const Route = createFileRoute("/admin")({
 });
 
 // Brand tokens
+// A failed save used to lose everything typed since the last good one. The
+// browser keeps a copy so the work survives a server error or a closed tab.
+const DRAFT_KEY = "lf_admin_draft";
+
 const B = {
   dark: "#15151c",
   amber: "#c2893f",
@@ -38,6 +42,8 @@ function AdminPage() {
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [tab, setTab] = useState<"inhalte" | "statistiken">("inhalte");
   const [stats, setStats] = useState<AnalyticsView | null>(null);
+  const [hasDraft, setHasDraft] = useState(false);
+  const draftRef = useRef<SiteContent | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -45,8 +51,26 @@ function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (authed) getContent().then(setContent);
+    if (!authed) return;
+    getContent().then((server) => {
+      // A draft that differs from the server is unsaved work from a failed
+      // save or a closed tab, so offer it back instead of silently dropping it.
+      let draft: SiteContent | null = null;
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (raw && raw !== JSON.stringify(server)) draft = JSON.parse(raw) as SiteContent;
+      } catch { /* private mode or corrupt draft */ }
+      setHasDraft(!!draft);
+      draftRef.current = draft;
+      setContent(server);
+    });
   }, [authed]);
+
+  // Keep a local copy of every edit, so a failed save is recoverable.
+  useEffect(() => {
+    if (!content) return;
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(content)); } catch { /* private mode */ }
+  }, [content]);
 
   // Loading here also refreshes the archive, so it keeps filling even if the
   // daily cron stops running.
@@ -67,6 +91,8 @@ function AdminPage() {
     setStatus("saving");
     try {
       await saveContent({ data: content });
+      // Only drop the local copy once the server confirms it has the text.
+      try { localStorage.removeItem(DRAFT_KEY); } catch { /* private mode */ }
       setStatus("saved");
       iframeRef.current?.contentWindow?.location.reload();
       setTimeout(() => setStatus("idle"), 2500);
@@ -176,7 +202,7 @@ function AdminPage() {
                 <span style={{ color: "#7ed4a0", fontSize: "0.82rem", fontWeight: 600 }}>Gespeichert ✓</span>
               )}
               {status === "error" && (
-                <span style={{ color: "#f87171", fontSize: "0.82rem" }}>Fehler beim Speichern</span>
+                <span style={{ color: "#f87171", fontSize: "0.82rem", fontWeight: 700 }}>Nicht gespeichert</span>
               )}
               <button onClick={handleSave} disabled={status === "saving"} style={S.primaryBtn}>
                 {status === "saving" ? "Speichert…" : "Speichern"}
@@ -188,6 +214,33 @@ function AdminPage() {
           </button>
         </div>
       </header>
+
+      {status === "error" && (
+        <div style={S.alertBad}>
+          <strong>Die Änderungen wurden nicht gespeichert.</strong> Ihre Texte sind noch da und gehen nicht
+          verloren — auch wenn Sie die Seite schliessen. Bitte nochmals auf Speichern tippen. Klappt es wieder
+          nicht, geben Sie Soleil Bescheid.
+          <button onClick={handleSave} style={{ ...S.primaryBtn, marginLeft: "0.75rem" }}>Nochmals speichern</button>
+        </div>
+      )}
+
+      {hasDraft && (
+        <div style={S.alertWarn}>
+          Es gibt ungespeicherte Änderungen von einem früheren Besuch.
+          <button
+            onClick={() => { if (draftRef.current) setContent(draftRef.current); setHasDraft(false); }}
+            style={{ ...S.primaryBtn, marginLeft: "0.75rem" }}
+          >
+            Wiederherstellen
+          </button>
+          <button
+            onClick={() => { try { localStorage.removeItem(DRAFT_KEY); } catch { /* private mode */ } setHasDraft(false); }}
+            style={{ ...S.ghostBtnLight, marginLeft: "0.5rem" }}
+          >
+            Verwerfen
+          </button>
+        </div>
+      )}
 
       {tab === "statistiken" && <AnalyticsPanel stats={stats} onReload={() => setStats(null)} />}
 
@@ -238,7 +291,7 @@ function AdminPage() {
               <Field label="Untertitel" value={content.hero.subtitle} onChange={(v) => setContent({ ...content, hero: { ...content.hero, subtitle: v } })} textarea preview="body-dark" />
             </EditorSection>
 
-            <EditorSection title="Über uns">
+            <EditorSection title="Über mich">
               <Field label="Überschrift" value={content.about.heading || ""} onChange={(v) => setContent({ ...content, about: { ...content.about, heading: v } })} textarea preview="heading" />
               <Field label="Absatz 1" value={content.about.paragraph1} onChange={(v) => setContent({ ...content, about: { ...content.about, paragraph1: v } })} textarea preview="body-light" />
               <Field label="Absatz 2" value={content.about.paragraph2} onChange={(v) => setContent({ ...content, about: { ...content.about, paragraph2: v } })} textarea preview="body-light" />
@@ -865,6 +918,21 @@ const S: Record<string, React.CSSProperties> = {
     padding: "0.35rem 0.9rem",
     fontSize: "0.78rem",
     cursor: "pointer",
+  },
+  alertBad: {
+    background: "#fdecea",
+    borderBottom: "2px solid #e74c3c",
+    color: "#7f1d1d",
+    padding: "0.85rem 1.25rem",
+    fontSize: "0.88rem",
+    lineHeight: 1.5,
+  },
+  alertWarn: {
+    background: B.amberLight,
+    borderBottom: `2px solid ${B.amber}`,
+    color: B.text,
+    padding: "0.75rem 1.25rem",
+    fontSize: "0.85rem",
   },
   hintBox: {
     background: B.amberLight,

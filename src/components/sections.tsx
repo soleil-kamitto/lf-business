@@ -43,7 +43,7 @@ import { Highlight } from "@/lib/highlight";
 
 const NAV = [
   { label: "Start", to: "/" },
-  { label: "Über uns", to: "/ueber-uns" },
+  { label: "Über mich", to: "/ueber-uns" },
   { label: "Leistungen", to: "/leistungen" },
   { label: "Kontakt", to: "/kontakt" },
 ];
