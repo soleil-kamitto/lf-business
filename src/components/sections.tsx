@@ -833,6 +833,11 @@ export function Servicios({ content, images, spezialImages, positions, spezialPo
               Spezialgebiete
             </div>
             <h3 className="text-2xl sm:text-4xl font-display font-bold"><Highlight text={content.spezialHeading || "Beratung, die über Marketing hinausgeht."} /></h3>
+            {content.spezialText && (
+              <p className="mt-4 text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto whitespace-pre-line">
+                <Highlight text={content.spezialText} />
+              </p>
+            )}
           </Reveal>
           <div className="flex flex-wrap justify-center gap-6">
             {filled(content.spezial).map((it, i) => (

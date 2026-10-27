@@ -373,6 +373,7 @@ function AdminPage() {
                     textarea preview="card-text" />
                 </div>
               ))}
+              <AddCardButton label="Neue Expertise-Karte" onAdd={() => setContent({ ...content, liza: { ...content.liza, expertise: [...content.liza.expertise, { title: "", text: "" }] } })} />
             </EditorSection>
 
             <EditorSection title="Beratung (Consultorias)">
@@ -391,6 +392,7 @@ function AdminPage() {
                     textarea preview="card-text-dark" />
                 </div>
               ))}
+              <AddCardButton label="Neue Beratungskarte" onAdd={() => setContent({ ...content, consultorias: [...content.consultorias, { title: "", phrase: "" }] })} />
             </EditorSection>
 
             <EditorSection title="Leistungen">
@@ -439,9 +441,11 @@ function AdminPage() {
                   />
                 </div>
               ))}
+              <AddCardButton label="Neue Leistung" onAdd={() => setContent({ ...content, servicios: { ...content.servicios, services: [...content.servicios.services, { title: "", text: "" }] } })} />
 
               <SubGroupLabel>Spezialgebiete</SubGroupLabel>
               <Field label="Überschrift Spezialgebiete" value={content.servicios.spezialHeading || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, spezialHeading: v } })} preview="heading" />
+              <Field label="Text unter der Überschrift Spezialgebiete" value={content.servicios.spezialText || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, spezialText: v } })} textarea preview="body-light" />
               {content.servicios.spezial.map((s, i) => (
                 <div key={i} style={S.subCard}>
                   {i < 4 && (
@@ -466,6 +470,7 @@ function AdminPage() {
                     textarea preview="card-text" />
                 </div>
               ))}
+              <AddCardButton label="Neues Spezialgebiet" onAdd={() => setContent({ ...content, servicios: { ...content.servicios, spezial: [...content.servicios.spezial, { title: "", text: "" }] } })} />
               <SubGroupLabel>Banner ("Bereit zu wachsen?")</SubGroupLabel>
               <Field label="Überschrift Banner" value={content.servicios.bannerHeading || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, bannerHeading: v } })} preview="card-title" />
               <Field label="Text Banner" value={content.servicios.bannerText || ""} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, bannerText: v } })} textarea preview="card-text" />
@@ -753,6 +758,15 @@ function EditorSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
+/** Cards could be emptied to delete them but never created; this adds one. */
+function AddCardButton({ label, onAdd }: { label: string; onAdd: () => void }) {
+  return (
+    <button onClick={onAdd} style={{ ...S.ghostBtnLight, borderStyle: "dashed", width: "100%", padding: "0.7rem" }}>
+      + {label}
+    </button>
+  );
+}
+
 function SubGroupLabel({ children }: { children: React.ReactNode }) {
   return (
     <p style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.15em", color: B.amber, fontWeight: 700, margin: "1.25rem 0 0.5rem", fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -957,18 +971,24 @@ const S: Record<string, React.CSSProperties> = {
   section: {
     background: B.white,
     borderRadius: 14,
-    padding: "1.25rem 1.5rem",
-    marginBottom: "1rem",
+    padding: "0 1.5rem 1.5rem",
+    marginBottom: "2rem",
     border: `1px solid ${B.border}`,
     boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
   },
+  // Sticks to the top while scrolling a long section, so Liza always sees
+  // which part of the site she is editing.
   sectionHeader: {
+    position: "sticky" as const,
+    top: 0,
+    zIndex: 2,
     display: "flex",
     alignItems: "center",
     gap: "0.6rem",
     marginBottom: "1rem",
-    paddingBottom: "0.75rem",
-    borderBottom: `1px solid ${B.border}`,
+    padding: "0.9rem 0",
+    background: B.white,
+    borderBottom: `2px solid ${B.amber}`,
   },
   tabOn: {
     background: "rgba(255,255,255,0.12)",

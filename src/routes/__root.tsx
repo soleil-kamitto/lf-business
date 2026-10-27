@@ -107,6 +107,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+    // Cookieless, so the site needs no consent banner. Loaded async: it never
+    // blocks the page, and if it fails to load nothing else breaks.
+    scripts: [
+      {
+        "data-goatcounter": "https://lf-business.goatcounter.com/count",
+        async: true,
+        src: "//gc.zgo.at/count.js",
+      },
+    ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

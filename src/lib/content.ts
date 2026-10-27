@@ -27,6 +27,7 @@ export type SiteContent = {
     services: { title: string; text: string; bullets?: string[] }[];
     spezial: { title: string; text: string }[];
     spezialHeading: string;
+    spezialText: string;
     bannerHeading: string;
     bannerText: string;
   };
@@ -142,6 +143,7 @@ export const defaultContent: SiteContent = {
       { title: "Werbung", text: "Kampagnen, die Aufmerksamkeit in Kunden verwandeln." },
     ],
     spezialHeading: "Beratung, die über Marketing hinausgeht.",
+    spezialText: "Denken weiter, verbinden Perspektiven und machen aus Möglichkeiten konkrete Lösungen.",
     bannerHeading: "Bereit zu wachsen?",
     bannerText: "Erzählen Sie uns von Ihrem Projekt. Wir entwickeln gemeinsam die passende Strategie.",
     spezial: [
