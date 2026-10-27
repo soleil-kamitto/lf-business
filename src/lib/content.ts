@@ -24,7 +24,7 @@ export type SiteContent = {
   servicios: {
     heading: string;
     subheading: string;
-    services: { title: string; text: string }[];
+    services: { title: string; text: string; bullets?: string[] }[];
     spezial: { title: string; text: string }[];
     spezialHeading: string;
     bannerHeading: string;
@@ -61,10 +61,11 @@ export type SiteContent = {
     spezial2: string | null;
     spezial3: string | null;
     spezial4: string | null;
+    bannerVideo: string | null;
   };
 };
 
-export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "serviciosBanner", "service1", "service2", "service3", "spezial1", "spezial2", "spezial3", "spezial4"] as const;
+export const IMAGE_SLOTS = ["lizaPortrait", "consultoria1", "consultoria2", "serviciosBanner", "service1", "service2", "service3", "spezial1", "spezial2", "spezial3", "spezial4", "bannerVideo"] as const;
 export type ImageSlot = (typeof IMAGE_SLOTS)[number];
 
 export const defaultContent: SiteContent = {
@@ -150,6 +151,10 @@ export const defaultContent: SiteContent = {
         title: "Kursdesign",
         text: "Sie sind Experte auf Ihrem Gebiet und möchten Ihr Wissen weitergeben? Wir entwickeln die Strategie und den Aufbau Ihres Kurses, angepasst an Sie und Ihr Publikum.",
       },
+      {
+        title: "Digitale Lösungen, die Ihr Unternehmen weiterbringen",
+        text: "Ich unterstütze Unternehmen dabei, passende digitale Lösungen für ihre individuellen Anforderungen zu finden. Ich verstehe Ihre Ziele, berate Sie zu den Möglichkeiten und koordiniere die Zusammenarbeit mit meinem Entwicklerteam – von der ersten Idee bis zur fertigen Lösung.",
+      },
     ],
   },
   kiContent: {
@@ -193,6 +198,7 @@ export const defaultContent: SiteContent = {
     spezial2: null,
     spezial3: null,
     spezial4: null,
+    bannerVideo: null,
   },
 };
 
@@ -214,8 +220,24 @@ function mergeDeep<T>(base: T, override: Partial<T> | undefined): T {
   return (override as unknown as T) ?? base;
 }
 
+async function loadDevFixture(): Promise<Partial<SiteContent> | null> {
+  try {
+    const { readFile } = await import("node:fs/promises");
+    return JSON.parse(await readFile("content-live.json", "utf8")) as Partial<SiteContent>;
+  } catch {
+    return null; // not exported yet — fall through to defaults
+  }
+}
+
 export const getContent = createServerFn({ method: "GET" }).handler(async (): Promise<SiteContent> => {
   try {
+    // In dev the blob store is unreachable (no read-only token exists, and we
+    // deliberately keep a writable one off the laptop). content-live.json is a
+    // read-only export of the live site, so local pages show Liza's real text.
+    if (import.meta.env?.DEV) {
+      const fixture = await loadDevFixture();
+      if (fixture) return mergeDeep(defaultContent, fixture);
+    }
     // R2 reads are authenticated and uncached, so a save is visible on the very
     // next request — no admin/visitor split and no cache busting needed.
     const stored = await getJson<Partial<SiteContent>>(CONTENT_KEY);
@@ -245,8 +267,9 @@ export const uploadImage = createServerFn({ method: "POST" })
     const slot = data.get("slot");
     if (!(file instanceof File)) throw new Error("Keine Datei erhalten.");
     if (typeof slot !== "string" || !slot) throw new Error("Kein Bildplatz angegeben.");
-    if (!file.type.startsWith("image/")) throw new Error("Bitte eine Bilddatei hochladen.");
-    if (file.size > MAX_IMAGE_BYTES) throw new Error("Bild ist zu gross (max. 8 MB).");
+    const isVideo = file.type.startsWith("video/");
+    if (!file.type.startsWith("image/") && !isVideo) throw new Error("Bitte eine Bild- oder Videodatei hochladen.");
+    if (file.size > MAX_IMAGE_BYTES) throw new Error("Datei ist zu gross (max. 8 MB).");
 
     const ext = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
     const key = `images/${slot}-${Date.now()}.${ext}`;

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="de-CH">
+  <head>
+    <meta charset="utf-8" />
+    <title>Formular-Registrierung</title>
+  </head>
+  <body>
+    <!--
+      Netlify detects forms by parsing the built HTML at deploy time. The real
+      contact form is rendered by React, so it is never in that HTML and would
+      never be registered. This hidden copy registers it; the field names must
+      match exactly what the component submits.
+    -->
+    <form name="kontakt" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="kontakt" />
+      <input type="text" name="bot-field" />
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+    </form>
+  </body>
+</html>

@@ -34,12 +34,14 @@ import videoAi from "@/assets/video-ai.mp4";
 // tightest budget on the plan. The full-quality file above is only fetched when
 // someone actually presses play further down the page.
 import videoAiHero from "@/assets/video-ai-hero.mp4";
+import flujoLoop from "@/assets/flujo_loop.mp4";
 import marcasDoTempoImg from "@/assets/brands/marcas-do-tempo.jpeg";
 import miniMintweltImg from "@/assets/brands/minimintwelt.jpeg";
 import puraVidaImg from "@/assets/brands/pura-vida.jpeg";
 import teufenImg from "@/assets/brands/teufen.jpeg";
 import type { SiteContent } from "@/lib/content";
 import { Highlight } from "@/lib/highlight";
+import { sendMessage } from "@/lib/messages";
 
 const NAV = [
   { label: "Start", to: "/" },
@@ -216,8 +218,13 @@ export function Hero({ content }: { content: SiteContent["hero"] }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
-  const words = content.title.split(" ");
-  const highlight = ["vor,", "inspirieren", "gestalten"];
+  // Words between *asterisks* carry the accent, same as every other field. The
+  // old hardcoded word list silently stopped matching once Liza rewrote the title.
+  const words = content.title.split(/(\*[^*]+\*)/).flatMap((part) =>
+    part.startsWith("*") && part.endsWith("*") && part.length > 2
+      ? [{ text: part.slice(1, -1), accent: true }]
+      : part.split(" ").filter(Boolean).map((w) => ({ text: w, accent: false })),
+  );
 
   return (
     <section
@@ -248,10 +255,21 @@ export function Hero({ content }: { content: SiteContent["hero"] }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/25 bg-white/10 backdrop-blur-md text-xs uppercase tracking-[0.2em] text-white/90 mb-8"
+            className="inline-block px-4 py-1.5 rounded-full border border-white/25 bg-white/10 backdrop-blur-md text-xs uppercase tracking-[0.2em] text-white/90 mb-8"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-pulse" />
-            {content.badge}
+            {/* Inline, not flex children: on two lines the dots must stay beside
+                the words instead of drifting to the corners of the pill. */}
+            {/* A "•" typed in the badge becomes an amber dot, so Liza decides
+                where the separators go instead of them being fixed in code. */}
+            <span className="inline-block align-middle w-1.5 h-1.5 rounded-full bg-amber-warm animate-pulse mr-2" />
+            {content.badge.split("•").map((part, i) => (
+              <span key={i}>
+                {i > 0 && (
+                  <span className="inline-block align-middle w-1.5 h-1.5 rounded-full bg-amber-warm animate-pulse mx-2" />
+                )}
+                {part.trim()}
+              </span>
+            ))}
           </motion.div>
 
           <h1 className="font-display font-bold leading-[1.05] text-4xl sm:text-6xl lg:text-8xl max-w-5xl text-white">
@@ -261,11 +279,9 @@ export function Hero({ content }: { content: SiteContent["hero"] }) {
                 initial={{ opacity: 0, y: 40, rotateX: -30 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 0.3 + i * 0.07, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className={`inline-block mr-3 ${
-                  highlight.includes(w) ? "text-gradient-warm italic" : ""
-                }`}
+                className={`inline-block mr-3 ${w.accent ? "text-gradient-warm italic" : ""}`}
               >
-                {w}
+                {w.text}
               </motion.span>
             ))}
           </h1>
@@ -276,7 +292,7 @@ export function Hero({ content }: { content: SiteContent["hero"] }) {
             transition={{ delay: 1.6, duration: 0.6 }}
             className="mt-8 max-w-xl text-white/75 text-lg"
           >
-            {content.subtitle}
+            <Highlight text={content.subtitle} />
           </motion.p>
 
           <motion.div
@@ -539,8 +555,8 @@ export function Liza({ content, portraitSrc, portraitPosition }: { content: Site
               >
                 <div className="shine-sweep rounded-2xl" />
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
-                <h3 className="font-display font-semibold text-xl mb-3">{e.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{e.text}</p>
+                <h3 className="font-display font-semibold text-xl mb-3"><Highlight text={e.title} /></h3>
+                <p className="text-sm text-muted-foreground leading-relaxed"><Highlight text={e.text} /></p>
               </motion.div>
             </Reveal>
           ))}
@@ -600,12 +616,18 @@ export function Consultorias({
                   <div className="shine-sweep rounded-3xl" />
                   <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
                     <div className="text-xs uppercase tracking-[0.3em] text-amber-warm mb-3">0{i + 1}</div>
-                    <h3 className="text-3xl sm:text-4xl font-display font-bold mb-3">{it.title}</h3>
-                    <p className="text-white/80 max-w-md mb-6">{it.phrase}</p>
-                    <a href="/kontakt" className="inline-flex items-center gap-2 text-sm font-medium border-b border-amber-warm pb-1 self-start group-hover:gap-4 transition-all">
-                      Mehr erfahren <span>→</span>
-                    </a>
+                    <h3 className="text-3xl sm:text-4xl font-display font-bold mb-3"><Highlight text={it.title} /></h3>
+                    <p className="text-white/80 max-w-md mb-6"><Highlight text={it.phrase} /></p>
+                    <span className="inline-flex items-center gap-2 text-sm font-medium border-b border-amber-warm pb-1 self-start group-hover:gap-4 transition-all">
+                      Gespräch vereinbaren <span>→</span>
+                    </span>
                   </div>
+                  {/* Covers the whole card: the small text link was an easy miss. */}
+                  <Link
+                    to="/kontakt"
+                    aria-label={`${it.title} — Gespräch vereinbaren`}
+                    className="absolute inset-0 z-10"
+                  />
                 </div>
               </Card3D>
             </Reveal>
@@ -640,7 +662,7 @@ export function Card3D({ children }: { children: ReactNode }) {
 
 /* ---------- MARQUEE TEXT BAND ---------- */
 export function Marquee() {
-  const words = ["Strategie", "•", "Branding", "•", "Design", "•", "Werbung", "•", "Wachstum", "•"];
+  const words = ["Strategie", "•", "Branding", "•", "Design", "•", "Werbung", "•", "Software", "•"];
   const row = [...words, ...words, ...words];
   return (
     <section className="py-12 bg-cream overflow-hidden border-y border-border">
@@ -660,13 +682,24 @@ export function Marquee() {
 }
 
 /* ---------- SERVICE CARDS (shared home + leistungen) ---------- */
-export function ServiceCards({ services, images, positions }: { services: SiteContent["servicios"]["services"]; images?: (string | null)[]; positions?: (string | undefined)[] }) {
+/** Makes a card clickable only where a target is given (the home teaser). */
+function CardLink({ href, label, children }: { href?: string; label: string; children: ReactNode }) {
+  if (!href) return <>{children}</>;
+  return (
+    <Link to={href} aria-label={`${label} — mehr erfahren`} className="block h-full">
+      {children}
+    </Link>
+  );
+}
+
+export function ServiceCards({ services, images, positions, href }: { services: SiteContent["servicios"]["services"]; images?: (string | null)[]; positions?: (string | undefined)[]; href?: string }) {
   return (
     <div className="flex flex-wrap justify-center gap-6">
       {filled(services).map((it, i) => {
         const bg = pick(images?.[i], SERVICE_CARD_IMAGES[i] ?? "");
         return (
         <Reveal key={it.title} delay={i * 0.1} className="w-full md:w-[calc(33.333%-1rem)]">
+          <CardLink href={href} label={it.title}>
           <motion.div
             whileHover={{ y: -12, rotateX: 3 }}
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
@@ -693,14 +726,37 @@ export function ServiceCards({ services, images, positions }: { services: SiteCo
             {/* Anchored to a fixed line, not to the card bottom, so the titles of
                 all three cards sit at the same height regardless of text length. */}
             <div className="relative mt-6 md:mt-0 md:absolute md:top-32 md:left-7 md:right-7">
-              <h3 className={`text-2xl font-display font-bold mb-2 capitalize transition-colors ${bg ? "group-hover:text-white" : ""}`}>{it.title}</h3>
-              <p className={`text-sm transition-colors ${bg ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}>{it.text}</p>
+              <h3 className={`text-2xl font-display font-bold mb-2 capitalize transition-colors ${bg ? "group-hover:text-white" : ""}`}><Highlight text={it.title} /></h3>
+              <p className={`text-sm transition-colors ${bg ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}><Highlight text={it.text} /></p>
+              {!href && it.bullets && it.bullets.length > 0 && (
+                <ul className={`mt-3 space-y-1 text-sm ${bg ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}>
+                  {it.bullets.filter((b) => b.trim()).map((b, bi) => (
+                    <motion.li
+                      key={b}
+                      initial={{ opacity: 0, x: -12 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ delay: bi * 0.09, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex gap-2"
+                    >
+                      <span className="text-amber-warm shrink-0">•</span>
+                      <span>{b}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              )}
+              {href && (
+                <span className={`mt-4 inline-flex items-center gap-2 text-sm font-medium border-b pb-1 transition-all group-hover:gap-3 ${bg ? "border-amber-warm group-hover:text-white" : "border-amber-warm"}`}>
+                  Mehr erfahren <span>→</span>
+                </span>
+              )}
             </div>
             <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-warm to-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               <div className="absolute -inset-x-10 -top-10 h-40 bg-gradient-to-r from-transparent via-amber-warm/10 to-transparent rotate-12 blur-2xl" />
             </div>
           </motion.div>
+          </CardLink>
         </Reveal>
         );
       })}
@@ -723,7 +779,7 @@ export function LeistungenTeaser({ services, content, images, positions }: { ser
           </Reveal>
         </div>
 
-        <ServiceCards services={services} images={images} positions={positions} />
+        <ServiceCards services={services} images={images} positions={positions} href="/leistungen" />
 
         <Reveal className="mt-14 text-center">
           <MagneticButton href="/leistungen" primary>
@@ -736,17 +792,17 @@ export function LeistungenTeaser({ services, content, images, positions }: { ser
 }
 
 /* ---------- SERVICIOS (full, leistungen page) ---------- */
-export function Servicios({ content, bannerImage, images, spezialImages, positions, spezialPositions, bannerPosition }: { content: SiteContent["servicios"]; bannerImage?: string | null; images?: (string | null)[]; spezialImages?: (string | null)[]; positions?: (string | undefined)[]; spezialPositions?: (string | undefined)[]; bannerPosition?: string }) {
+export function Servicios({ content, images, spezialImages, positions, spezialPositions, bannerVideo }: { content: SiteContent["servicios"]; images?: (string | null)[]; spezialImages?: (string | null)[]; positions?: (string | undefined)[]; spezialPositions?: (string | undefined)[]; bannerVideo?: string | null }) {
   return (
     <section id="servicios" className="py-32 px-6 bg-secondary/40">
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 mb-16 items-end">
-          <Reveal className="lg:col-span-7">
+        <div className="mb-16 text-center">
+          <Reveal className="flex flex-col items-center">
             <SectionLabel>Leistungen</SectionLabel>
             <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={content.heading} /></h2>
           </Reveal>
-          <Reveal delay={0.15} className="lg:col-span-5 text-muted-foreground text-lg">
-            {content.subheading}
+          <Reveal delay={0.15} className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto">
+            <Highlight text={content.subheading} />
           </Reveal>
         </div>
 
@@ -755,7 +811,7 @@ export function Servicios({ content, bannerImage, images, spezialImages, positio
         </div>
 
         <div className="mb-16">
-          <Reveal className="mb-10">
+          <Reveal className="mb-10 flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-amber-warm font-medium mb-3">
               <span className="w-8 h-px bg-amber-warm" />
               Spezialgebiete
@@ -787,28 +843,46 @@ export function Servicios({ content, bannerImage, images, spezialImages, positio
                   <div className="relative w-10 h-10 rounded-lg grid place-items-center bg-amber-warm/15 text-amber-warm font-display font-bold mb-4">
                     0{i + 4}
                   </div>
-                  <h4 className={`relative font-display font-semibold text-lg mb-2 transition-colors ${pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") ? "group-hover:text-white" : ""}`}>{it.title}</h4>
-                  <p className={`relative text-sm leading-relaxed transition-colors ${pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}>{it.text}</p>
+                  <h4 className={`relative font-display font-semibold text-lg mb-2 transition-colors ${pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") ? "group-hover:text-white" : ""}`}><Highlight text={it.title} /></h4>
+                  <p className={`relative text-sm leading-relaxed transition-colors ${pick(spezialImages?.[i], SPEZIAL_CARD_IMAGES[i] ?? "") ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}><Highlight text={it.text} /></p>
                 </motion.div>
               </Reveal>
             ))}
           </div>
-        </div>
 
-        <Reveal>
-          <div className="relative rounded-3xl overflow-hidden">
-            {pick(bannerImage, servicesImg) && (
-              <img src={pick(bannerImage, servicesImg)!} alt="" loading="lazy" width={1400} height={1200} className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: bannerPosition || "center center" }} />
-            )}
-            <div className="relative min-h-72 bg-gradient-to-r from-black/75 via-black/40 to-transparent flex items-center px-6 sm:px-10 py-10">
-              <div className="text-white max-w-xl">
-                <h3 className="text-3xl font-display font-bold mb-3">{content.bannerHeading || "Bereit zu wachsen?"}</h3>
-                <p className="text-white/80 mb-6">{content.bannerText || "Erzählen Sie uns von Ihrem Projekt. Wir entwickeln gemeinsam die passende Strategie."}</p>
-                <MagneticButton href="/kontakt" primary>Beratung anfragen</MagneticButton>
+          {/* Silent looping clip: decorative, so it carries no controls and is
+              hidden from screen readers. */}
+          {/* The banner sits on the loop instead of a still photo. */}
+          <Reveal delay={0.15} className="mt-12">
+            <div className="relative rounded-3xl overflow-hidden">
+              {/* In normal flow, not absolute: the clip keeps its own aspect
+                  ratio so no part of the frame is cropped away. */}
+              <video
+                src={bannerVideo || flujoLoop}
+                autoPlay
+                muted
+                loop
+                playsInline
+                aria-hidden="true"
+                className="w-full h-auto block"
+              />
+              {/* Overlaid only where there is room; on a phone it sits below
+                  the clip so neither the video nor the text is cut. */}
+              <div className="bg-foreground sm:bg-transparent sm:absolute sm:inset-0 sm:bg-gradient-to-r sm:from-black/85 sm:via-black/55 sm:to-black/10 flex items-center px-6 sm:px-10 py-8 sm:py-10">
+                <div className="text-white max-w-xl">
+                  <h3 className="text-3xl font-display font-bold mb-3">
+                    <Highlight text={content.bannerHeading || "Bereit zu wachsen?"} />
+                  </h3>
+                  <p className="text-white/80 mb-6">
+                    <Highlight text={content.bannerText || "Erzählen Sie uns von Ihrem Projekt. Wir entwickeln gemeinsam die passende Strategie."} />
+                  </p>
+                  <MagneticButton href="/kontakt" primary>Beratung anfragen</MagneticButton>
+                </div>
               </div>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
+
       </div>
     </section>
   );
@@ -978,7 +1052,7 @@ export function KontaktCTA({ content }: { content?: SiteContent["kontaktCta"] })
 
 /* ---------- CONTACTO ---------- */
 export function Contacto({ content, heading }: { content: SiteContent["contact"]; heading?: string }) {
-  const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   return (
     <section id="contacto" className="pt-44 pb-32 px-6 bg-secondary/40">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16">
@@ -1016,10 +1090,41 @@ export function Contacto({ content, heading }: { content: SiteContent["contact"]
 
         <Reveal delay={0.15}>
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
+              const form = e.currentTarget;
+              const data = new FormData(form);
               setStatus("loading");
-              setTimeout(() => setStatus("ok"), 1200);
+              try {
+                await sendMessage({
+                  data: {
+                    name: String(data.get("name") ?? ""),
+                    email: String(data.get("email") ?? ""),
+                    message: String(data.get("msg") ?? ""),
+                  },
+                });
+                // Also hand it to Netlify Forms, which is what sends the email
+                // alert. Its recipients are managed in the Netlify UI, so they
+                // can change later without touching the code.
+                void fetch("/__forms.html", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                  body: new URLSearchParams({
+                    "form-name": "kontakt",
+                    name: String(data.get("name") ?? ""),
+                    email: String(data.get("email") ?? ""),
+                    message: String(data.get("msg") ?? ""),
+                  }).toString(),
+                }).catch(() => {
+                  // The message is already stored; a failed alert must not
+                  // make the visitor think nothing was sent.
+                });
+                setStatus("ok");
+                form.reset();
+              } catch {
+                // Never show a green tick for a message that was not stored.
+                setStatus("error");
+              }
             }}
             className="bg-card p-8 rounded-3xl border border-border space-y-6"
           >
@@ -1028,13 +1133,20 @@ export function Contacto({ content, heading }: { content: SiteContent["contact"]
             <Field label="Erzählen Sie uns von Ihrem Projekt" name="msg" textarea />
             <button
               type="submit"
-              disabled={status !== "idle"}
+              disabled={status === "loading" || status === "ok"}
               className="w-full py-4 rounded-full bg-foreground text-background font-medium relative overflow-hidden hover:bg-amber-warm transition-colors shimmer disabled:opacity-80"
             >
               {status === "idle" && "Nachricht senden"}
               {status === "loading" && "Wird gesendet..."}
               {status === "ok" && "Nachricht gesendet ✓"}
+              {status === "error" && "Nochmals senden"}
             </button>
+            {status === "error" && (
+              <p className="text-sm text-destructive">
+                Die Nachricht konnte nicht gesendet werden. Bitte nochmals versuchen oder direkt an{" "}
+                <a href={`mailto:${content.email}`} className="underline">{content.email}</a> schreiben.
+              </p>
+            )}
           </form>
         </Reveal>
       </div>

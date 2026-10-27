@@ -31,7 +31,10 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
-.env*.local
+.env
+.env.*
+!.env.example
 
 # Local Netlify folder
 .netlify
+content-live.json

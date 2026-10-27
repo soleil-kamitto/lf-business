@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { checkAdminAuth, loginAdmin, logoutAdmin } from "@/lib/adminAuth";
 import { getContent, saveContent, uploadImage, type SiteContent, type ImageSlot } from "@/lib/content";
 import { getAnalytics, type AnalyticsView } from "@/lib/analytics";
+import { listMessages, markMessageRead, deleteMessage, type ContactMessage } from "@/lib/messages";
 import { Highlight } from "@/lib/highlight";
 
 export const Route = createFileRoute("/admin")({
@@ -40,9 +41,10 @@ function AdminPage() {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
-  const [tab, setTab] = useState<"inhalte" | "statistiken">("inhalte");
+  const [tab, setTab] = useState<"inhalte" | "statistiken" | "nachrichten">("inhalte");
   const [stats, setStats] = useState<AnalyticsView | null>(null);
   const [hasDraft, setHasDraft] = useState(false);
+  const [messages, setMessages] = useState<ContactMessage[] | null>(null);
   const draftRef = useRef<SiteContent | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -76,7 +78,8 @@ function AdminPage() {
   // daily cron stops running.
   useEffect(() => {
     if (authed && tab === "statistiken" && !stats) getAnalytics().then(setStats);
-  }, [authed, tab, stats]);
+    if (authed && tab === "nachrichten" && !messages) listMessages().then(setMessages);
+  }, [authed, tab, stats, messages]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -176,6 +179,9 @@ function AdminPage() {
             <button onClick={() => setTab("statistiken")} style={tab === "statistiken" ? S.tabOn : S.tabOff}>
               Statistiken
             </button>
+            <button onClick={() => setTab("nachrichten")} style={tab === "nachrichten" ? S.tabOn : S.tabOff}>
+              Nachrichten
+            </button>
           </nav>
         </div>
         <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
@@ -243,6 +249,8 @@ function AdminPage() {
       )}
 
       {tab === "statistiken" && <AnalyticsPanel stats={stats} onReload={() => setStats(null)} />}
+
+      {tab === "nachrichten" && <MessagesPanel messages={messages} onChanged={() => setMessages(null)} />}
 
       {/* ── Split body ── */}
       {tab === "inhalte" && (
@@ -364,8 +372,12 @@ function AdminPage() {
             </EditorSection>
 
             <EditorSection title="Leistungen">
-              <ImageField {...focus("serviciosBanner")} label={`Banner-Bild ("Bereit zu wachsen?")`} slot="serviciosBanner" value={content.images.serviciosBanner}
-                onChange={(url) => setContent({ ...content, images: { ...content.images, serviciosBanner: url } })} />
+              <ImageField
+                label={`Video im Banner ("Bereit zu wachsen?") — MP4, leer lassen = Standardvideo`}
+                slot="bannerVideo"
+                value={content.images.bannerVideo}
+                onChange={(url) => setContent({ ...content, images: { ...content.images, bannerVideo: url } })}
+              />
               <Field label="Überschrift" value={content.servicios.heading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, heading: v } })} preview="heading" />
               <Field label="Unterzeile" value={content.servicios.subheading} onChange={(v) => setContent({ ...content, servicios: { ...content.servicios, subheading: v } })} textarea preview="body-light" />
 
@@ -392,6 +404,17 @@ function AdminPage() {
                   <Field label="Text" value={s.text}
                     onChange={(v) => { const services = [...content.servicios.services]; services[i] = { ...services[i], text: v }; setContent({ ...content, servicios: { ...content.servicios, services } }); }}
                     textarea preview="card-text" />
+                  <Field
+                    label="Stichpunkte, ein Punkt pro Zeile (nur auf der Leistungen-Seite)"
+                    value={(s.bullets || []).join("\n")}
+                    onChange={(v) => {
+                      const services = [...content.servicios.services];
+                      services[i] = { ...services[i], bullets: v.split("\n") };
+                      setContent({ ...content, servicios: { ...content.servicios, services } });
+                    }}
+                    textarea
+                    preview="card-text"
+                  />
                 </div>
               ))}
 
@@ -482,6 +505,71 @@ const STATUS_NOTE: Record<AnalyticsView["status"], string | null> = {
   "token-invalid": "Der Zugang ist abgelaufen. Die unten gezeigten Zahlen stammen aus dem Archiv und werden gerade nicht aktualisiert.",
   error: "Die Zahlen konnten nicht frisch geladen werden. Unten steht der zuletzt gespeicherte Stand.",
 };
+
+function MessagesPanel({ messages, onChanged }: { messages: ContactMessage[] | null; onChanged: () => void }) {
+  if (!messages) {
+    return <div style={S.statsWrap}><p style={{ color: B.muted, fontSize: "0.9rem" }}>Nachrichten werden geladen…</p></div>;
+  }
+
+  const unread = messages.filter((m) => !m.read).length;
+
+  return (
+    <div style={S.statsWrap}>
+      <div style={{ maxWidth: 820, margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
+          <h2 style={{ ...S.h2, fontSize: "1.1rem" }}>
+            Anfragen über das Kontaktformular{unread > 0 && ` · ${unread} neu`}
+          </h2>
+          <button onClick={onChanged} style={S.ghostBtnLight}>Aktualisieren</button>
+        </div>
+
+        {messages.length === 0 ? (
+          <div style={S.card}>
+            <p style={{ fontSize: "0.88rem", color: B.muted, margin: 0, lineHeight: 1.6 }}>
+              Noch keine Anfragen. Neue Nachrichten aus dem Formular erscheinen hier automatisch.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            {messages.map((m) => (
+              <div key={m.id} style={{ ...S.card, borderLeft: `3px solid ${m.read ? B.border : B.amber}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+                  <div>
+                    <strong style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{m.name}</strong>
+                    <a href={`mailto:${m.email}`} style={{ marginLeft: "0.6rem", fontSize: "0.85rem", color: B.bar }}>{m.email}</a>
+                  </div>
+                  <span style={{ fontSize: "0.75rem", color: B.muted }}>
+                    {new Date(m.at).toLocaleString("de-CH")}
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.9rem", lineHeight: 1.6, margin: "0 0 0.75rem", whiteSpace: "pre-line" }}>{m.message}</p>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <a href={`mailto:${m.email}`} style={{ ...S.primaryBtn, textDecoration: "none" }}>Antworten</a>
+                  <button
+                    onClick={() => markMessageRead({ data: { id: m.id, read: !m.read } }).then(onChanged)}
+                    style={S.ghostBtnLight}
+                  >
+                    {m.read ? "Als neu markieren" : "Als erledigt markieren"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Nachricht von ${m.name} wirklich löschen?`)) {
+                        deleteMessage({ data: { id: m.id } }).then(onChanged);
+                      }
+                    }}
+                    style={{ ...S.ghostBtnLight, color: B.error, borderColor: "#f5c6c0" }}
+                  >
+                    🗑 Löschen
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function AnalyticsPanel({ stats, onReload }: { stats: AnalyticsView | null; onReload: () => void }) {
   if (!stats) {
@@ -701,7 +789,7 @@ function ImageField({ label, slot, value, onChange, position, onPosition }: { la
           {/* ghostBtn is white-on-dark for the header; on this white card it was invisible. */}
           <label style={{ ...S.ghostBtnLight, display: "inline-block", cursor: "pointer" }}>
             {status === "uploading" ? "Lädt hoch…" : value ? "Bild ersetzen" : "Bild hochladen"}
-            <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0])} disabled={status === "uploading"} style={{ display: "none" }} />
+            <input type="file" accept="image/*,video/mp4" onChange={(e) => handleFile(e.target.files?.[0])} disabled={status === "uploading"} style={{ display: "none" }} />
           </label>
           {removed ? (
             <button

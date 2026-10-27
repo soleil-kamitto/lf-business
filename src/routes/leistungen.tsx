@@ -25,7 +25,7 @@ function Leistungen() {
       </div>
       <Servicios
         content={content.servicios}
-        bannerImage={content.images.serviciosBanner} bannerPosition={content.imagePositions?.serviciosBanner}
+        bannerVideo={content.images.bannerVideo}
         images={[content.images.service1, content.images.service2, content.images.service3]}
         positions={[content.imagePositions?.service1, content.imagePositions?.service2, content.imagePositions?.service3]}
         spezialImages={[content.images.spezial1, content.images.spezial2, content.images.spezial3, content.images.spezial4]}
