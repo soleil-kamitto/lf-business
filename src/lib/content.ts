@@ -45,6 +45,8 @@ export type SiteContent = {
     heading: string;
   };
   contactoHeading: string;
+  /** The small amber labels above each section heading. */
+  sectionLabels: Record<string, string>;
   branding: { heading: string; paragraph: string };
   contact: { address: string; email: string; phone: string; instagram: string; linkedin: string };
   /** CSS object-position per image slot, so Liza can reframe a crop herself. */
@@ -173,6 +175,15 @@ export const defaultContent: SiteContent = {
     heading: "Lassen Sie uns über Ihr Unternehmen sprechen.",
   },
   contactoHeading: "Sprechen wir über Ihren *nächsten Schritt*.",
+  sectionLabels: {
+    about: "Über mich",
+    liza: "Die Gründerin",
+    beratung: "Beratung",
+    leistungen: "Leistungen",
+    branding: "Branding",
+    clientes: "Kunden, Partner & Referenzen",
+    kontakt: "Kontakt",
+  },
   branding: {
     heading: "Wir gestalten nicht nur Anzeigen. Wir bauen *Marken mit Seele*.",
     paragraph:

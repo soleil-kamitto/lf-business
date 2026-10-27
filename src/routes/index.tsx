@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const content = Route.useLoaderData();
   return (
-    <PageShell>
+    <PageShell labels={content.sectionLabels}>
       <Hero content={content.hero} />
       <Marquee />
       <LeistungenTeaser

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/leistungen")({
 function Leistungen() {
   const content = Route.useLoaderData();
   return (
-    <PageShell>
+    <PageShell labels={content.sectionLabels}>
       <div className="pt-16">
         <Consultorias content={content.consultorias} heading={content.consultoriasHeading} text={content.consultoriasText} images={[content.images.consultoria1, content.images.consultoria2]} positions={[content.imagePositions?.consultoria1, content.imagePositions?.consultoria2]} />
       </div>

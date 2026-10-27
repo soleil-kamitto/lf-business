@@ -19,7 +19,7 @@ export const Route = createFileRoute("/ueber-uns")({
 function UeberUns() {
   const content = Route.useLoaderData();
   return (
-    <PageShell>
+    <PageShell labels={content.sectionLabels}>
       <div className="pt-16">
         <About content={content.about} />
       </div>

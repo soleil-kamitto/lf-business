@@ -19,7 +19,7 @@ export const Route = createFileRoute("/kontakt")({
 function Kontakt() {
   const content = Route.useLoaderData();
   return (
-    <PageShell>
+    <PageShell labels={content.sectionLabels}>
       <Contacto content={content.contact} heading={content.contactoHeading} />
     </PageShell>
   );

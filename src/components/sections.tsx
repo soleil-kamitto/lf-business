@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   motion,
   useScroll,
@@ -51,8 +51,11 @@ const NAV = [
 ];
 
 /* ---------- PAGE SHELL ---------- */
-export function PageShell({ children }: { children: ReactNode }) {
+const SectionLabelsContext = createContext<Record<string, string> | undefined>(undefined);
+
+export function PageShell({ children, labels }: { children: ReactNode; labels?: Record<string, string> }) {
   return (
+    <SectionLabelsContext.Provider value={labels}>
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <ScrollProgress />
       <CursorFollower />
@@ -60,6 +63,7 @@ export function PageShell({ children }: { children: ReactNode }) {
       {children}
       <Footer />
     </div>
+    </SectionLabelsContext.Provider>
   );
 }
 
@@ -384,11 +388,22 @@ export function Reveal({ children, delay = 0, className = "" }: { children: Reac
   );
 }
 
-export function SectionLabel({ children }: { children: ReactNode }) {
+/**
+ * Labels come from /admin through context rather than a prop on every section,
+ * which would mean threading one string through nine components. The child
+ * stays as the fallback, so a key Liza has not touched keeps its wording.
+ */
+export function SectionLabel({ id, children }: { id?: string; children: ReactNode }) {
+  const labels = useContext(SectionLabelsContext);
+  const custom = id ? labels?.[id]?.trim() : "";
   return (
-    <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-amber-warm font-medium mb-6">
-      <span className="w-8 h-px bg-amber-warm" />
-      {children}
+    // Centred in its own full-width row, so every section label lines up the
+    // same way regardless of whether its section is left-aligned or centred.
+    <div className="flex justify-center w-full mb-6">
+      <span className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-amber-warm font-medium">
+        <span className="w-8 h-px bg-amber-warm" />
+        {custom || children}
+      </span>
     </div>
   );
 }
@@ -397,9 +412,13 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 export function About({ content }: { content: SiteContent["about"] }) {
   return (
     <section id="about" className="py-32 px-6 bg-background">
+      {/* The label sits above the grid, not inside a column, so it centres on
+          the page rather than inside its half. */}
+      <div className="max-w-6xl mx-auto">
+        <SectionLabel id="about">Über mich</SectionLabel>
+      </div>
       <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
         <Reveal className="lg:col-span-5">
-          <SectionLabel>Über mich</SectionLabel>
           <h2 className="text-4xl sm:text-5xl font-display font-bold leading-tight">
             <Highlight text={content.heading} />
           </h2>
@@ -499,10 +518,11 @@ export function Liza({ content, portraitSrc, portraitPosition }: { content: Site
   return (
     <section id="liza" className="py-32 px-6 bg-secondary/40 overflow-hidden">
       <div className="max-w-7xl mx-auto">
+        {/* Above the grid so it centres on the page, not inside its column. */}
+        <SectionLabel id="liza">Die Gründerin</SectionLabel>
         <div className="grid lg:grid-cols-12 gap-14 items-center">
           <div className="lg:col-span-6">
             <Reveal>
-              <SectionLabel>Die Gründerin</SectionLabel>
               <h2 className="text-4xl sm:text-6xl font-display font-bold leading-tight">
                 Liza <span className="text-gradient-warm">Fässler</span>
               </h2>
@@ -587,7 +607,7 @@ export function Consultorias({
     <section id="consultorias" className="py-32 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
         <Reveal className="text-center mb-16">
-          <SectionLabel>Beratung</SectionLabel>
+          <SectionLabel id="beratung">Beratung</SectionLabel>
           <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={heading || "Wir begleiten jede Phase."} /></h2>
           {text && (
             <p className="mt-4 text-muted-foreground text-lg leading-relaxed whitespace-pre-line">
@@ -599,6 +619,7 @@ export function Consultorias({
         <div className="flex flex-wrap justify-center gap-8">
           {items.map((it, i) => (
             <Reveal key={it.title} delay={i * 0.15} className="w-full md:w-[calc(50%-1rem)]">
+              <Link to="/kontakt" aria-label={`${it.title} — Gespräch vereinbaren`} className="block">
               <Card3D>
                 {/* aspect ratio instead of a fixed height: the photo keeps its
                     proportions at every width, and object-top stops heads being cut. */}
@@ -622,14 +643,9 @@ export function Consultorias({
                       Gespräch vereinbaren <span>→</span>
                     </span>
                   </div>
-                  {/* Covers the whole card: the small text link was an easy miss. */}
-                  <Link
-                    to="/kontakt"
-                    aria-label={`${it.title} — Gespräch vereinbaren`}
-                    className="absolute inset-0 z-10"
-                  />
                 </div>
               </Card3D>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -704,7 +720,7 @@ export function ServiceCards({ services, images, positions, href }: { services: 
             whileHover={{ y: -12, rotateX: 3 }}
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
             style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-            className="relative min-h-72 p-7 rounded-2xl bg-card border border-border overflow-hidden group hover:border-amber-warm/50 hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500"
+            className="relative flex h-full min-h-72 flex-col p-7 rounded-2xl bg-card border border-border overflow-hidden group hover:border-amber-warm/50 hover:shadow-2xl hover:shadow-amber-warm/15 transition-[border-color,box-shadow] duration-500"
           >
             {/* Optional photo that fades in on hover; text stays readable via the scrim. */}
             {bg && (
@@ -725,7 +741,7 @@ export function ServiceCards({ services, images, positions, href }: { services: 
             </div>
             {/* Anchored to a fixed line, not to the card bottom, so the titles of
                 all three cards sit at the same height regardless of text length. */}
-            <div className="relative mt-6 md:mt-0 md:absolute md:top-32 md:left-7 md:right-7">
+            <div className="relative mt-auto">
               <h3 className={`text-2xl font-display font-bold mb-2 capitalize transition-colors ${bg ? "group-hover:text-white" : ""}`}><Highlight text={it.title} /></h3>
               <p className={`text-sm transition-colors ${bg ? "text-muted-foreground group-hover:text-white/85" : "text-muted-foreground"}`}><Highlight text={it.text} /></p>
               {!href && it.bullets && it.bullets.length > 0 && (
@@ -769,12 +785,12 @@ export function LeistungenTeaser({ services, content, images, positions }: { ser
   return (
     <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 mb-16 items-end">
-          <Reveal className="lg:col-span-7">
-            <SectionLabel>Leistungen</SectionLabel>
+        <div className="mb-16 text-center">
+          <Reveal className="flex flex-col items-center">
+            <SectionLabel id="leistungen">Leistungen</SectionLabel>
             <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={content?.heading || "Alles, was Ihre Marke braucht."} /></h2>
           </Reveal>
-          <Reveal delay={0.15} className="lg:col-span-5 text-muted-foreground text-lg">
+          <Reveal delay={0.15} className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto">
             {content?.description || "Von digitalem Marketing bis Geschäftsstrategie: integrierte Lösungen für nachhaltiges Wachstum."}
           </Reveal>
         </div>
@@ -798,7 +814,7 @@ export function Servicios({ content, images, spezialImages, positions, spezialPo
       <div className="max-w-7xl mx-auto">
         <div className="mb-16 text-center">
           <Reveal className="flex flex-col items-center">
-            <SectionLabel>Leistungen</SectionLabel>
+            <SectionLabel id="leistungen">Leistungen</SectionLabel>
             <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={content.heading} /></h2>
           </Reveal>
           <Reveal delay={0.15} className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -896,7 +912,7 @@ export function KiSoftware({ content }: { content?: SiteContent["kiContent"] }) 
     <section id="ki-software" className="py-32 px-6 bg-background overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <Reveal className="text-center mb-14">
-          <SectionLabel>KI & Software</SectionLabel>
+          <SectionLabel id="ki">KI & Software</SectionLabel>
           <h2 className="text-4xl sm:text-6xl font-display font-bold leading-tight">
             <Highlight text={content?.heading || "Die *digitale Zukunft* für Unternehmen im Appenzellerland."} />
           </h2>
@@ -947,7 +963,7 @@ export function Branding({ content }: { content: SiteContent["branding"] }) {
     <section id="branding" className="py-32 px-6 bg-cream relative overflow-hidden">
       <div className="relative max-w-5xl mx-auto text-center">
         <Reveal>
-          <SectionLabel>Branding</SectionLabel>
+          <SectionLabel id="branding">Branding</SectionLabel>
           <h2 className="text-4xl sm:text-7xl font-display font-bold leading-[1.05] mb-10">
             <Highlight text={content.heading || "Wir gestalten nicht nur Anzeigen. Wir bauen *Marken mit Seele*."} />
           </h2>
@@ -989,7 +1005,7 @@ export function Clientes({ heading, text }: { heading?: string; text?: string })
     <section id="clientes" className="py-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <Reveal>
-          <SectionLabel>Kunden, Partner & Referenzen</SectionLabel>
+          <SectionLabel id="clientes">Kunden, Partner & Referenzen</SectionLabel>
           <h2 className="text-4xl sm:text-5xl font-display font-bold"><Highlight text={heading || "Marken, die uns bereits vertrauen."} /></h2>
           {text && <p className="mt-5 text-muted-foreground text-lg leading-relaxed max-w-3xl">{text}</p>}
         </Reveal>
@@ -1055,9 +1071,11 @@ export function Contacto({ content, heading }: { content: SiteContent["contact"]
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   return (
     <section id="contacto" className="pt-44 pb-32 px-6 bg-secondary/40">
+      <div className="max-w-6xl mx-auto">
+        <SectionLabel id="kontakt">Kontakt</SectionLabel>
+      </div>
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16">
         <Reveal>
-          <SectionLabel>Kontakt</SectionLabel>
           <h1 className="text-4xl sm:text-6xl font-display font-bold leading-tight mb-8">
             <Highlight text={heading || "Sprechen wir über Ihren *nächsten Schritt*."} />
           </h1>

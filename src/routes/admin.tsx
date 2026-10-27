@@ -293,6 +293,28 @@ function AdminPage() {
               Akzentfarbe. Beispiel: Wir bauen <code style={S.code}>*Marken mit Seele*</code>.
             </div>
 
+            <EditorSection title="Abschnitts-Bezeichnungen (die kleinen orangen Titel)">
+              {([
+                ["about", "Über mich"],
+                ["liza", "Die Gründerin"],
+                ["beratung", "Beratung"],
+                ["leistungen", "Leistungen"],
+                ["branding", "Branding"],
+                ["clientes", "Kunden, Partner & Referenzen"],
+                ["kontakt", "Kontakt"],
+              ] as const).map(([key, fallback]) => (
+                <Field
+                  key={key}
+                  label={fallback}
+                  value={content.sectionLabels?.[key] ?? ""}
+                  onChange={(v) =>
+                    setContent({ ...content, sectionLabels: { ...content.sectionLabels, [key]: v } })
+                  }
+                  preview="eyebrow"
+                />
+              ))}
+            </EditorSection>
+
             <EditorSection title="Startseite (Hero)">
               <Field label="Badge (unter dem Logo)" value={content.hero.badge} onChange={(v) => setContent({ ...content, hero: { ...content.hero, badge: v } })} preview="badge" />
               <Field label="Titel" value={content.hero.title} onChange={(v) => setContent({ ...content, hero: { ...content.hero, title: v } })} textarea preview="hero-title" />
