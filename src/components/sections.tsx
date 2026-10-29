@@ -411,7 +411,7 @@ export function SectionLabel({ id, children }: { id?: string; children: ReactNod
 /* ---------- ABOUT ---------- */
 export function About({ content }: { content: SiteContent["about"] }) {
   return (
-    <section id="about" className="py-32 px-6 bg-background">
+    <section id="about" className="py-16 sm:py-20 px-6 bg-background">
       {/* The label sits above the grid, not inside a column, so it centres on
           the page rather than inside its half. */}
       <div className="max-w-6xl mx-auto">
@@ -516,7 +516,7 @@ export function Liza({ content, portraitSrc, portraitPosition }: { content: Site
   const expertise = filled(content.expertise);
   const journey = filled(content.journey);
   return (
-    <section id="liza" className="py-32 px-6 bg-secondary/40 overflow-hidden">
+    <section id="liza" className="py-16 sm:py-20 px-6 bg-secondary/40 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Above the grid so it centres on the page, not inside its column. */}
         <SectionLabel id="liza">Die Gründerin</SectionLabel>
@@ -565,7 +565,7 @@ export function Liza({ content, portraitSrc, portraitPosition }: { content: Site
 
         {/* Flex-wrap, not a grid: Liza can delete cards, and a short last row
             should stay centred instead of hugging the left edge. */}
-        <div className="mt-20 flex flex-wrap justify-center gap-5">
+        <div className="mt-12 flex flex-wrap justify-center gap-5">
           {expertise.map((e, i) => (
             <Reveal key={e.title} delay={i * 0.1} className="flex w-full md:w-[calc(33.333%-1rem)]">
               <motion.div
@@ -604,9 +604,9 @@ export function Consultorias({
 }) {
   const items = filled(content).map((it, i) => ({ ...it, img: pick(images?.[i], CONSULTORIAS_IMAGES[i]), pos: positions?.[i] }));
   return (
-    <section id="consultorias" className="py-32 px-6 bg-background">
+    <section id="consultorias" className="py-16 sm:py-20 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
-        <Reveal className="text-center mb-16">
+        <Reveal className="text-center mb-10">
           <SectionLabel id="beratung">Beratung</SectionLabel>
           <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={heading || "Wir begleiten jede Phase."} /></h2>
           {text && (
@@ -783,9 +783,9 @@ export function ServiceCards({ services, images, positions, href }: { services: 
 /* ---------- LEISTUNGEN TEASER (home) ---------- */
 export function LeistungenTeaser({ services, content, images, positions }: { services: SiteContent["servicios"]["services"]; content?: SiteContent["leistungenTeaser"]; images?: (string | null)[]; positions?: (string | undefined)[] }) {
   return (
-    <section className="py-32 px-6">
+    <section className="py-16 sm:py-20 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-16 text-center">
+        <div className="mb-10 text-center">
           <Reveal className="flex flex-col items-center">
             <SectionLabel id="leistungen">Leistungen</SectionLabel>
             <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={content?.heading || "Alles, was Ihre Marke braucht."} /></h2>
@@ -810,9 +810,9 @@ export function LeistungenTeaser({ services, content, images, positions }: { ser
 /* ---------- SERVICIOS (full, leistungen page) ---------- */
 export function Servicios({ content, images, spezialImages, positions, spezialPositions, bannerVideo }: { content: SiteContent["servicios"]; images?: (string | null)[]; spezialImages?: (string | null)[]; positions?: (string | undefined)[]; spezialPositions?: (string | undefined)[]; bannerVideo?: string | null }) {
   return (
-    <section id="servicios" className="py-32 px-6 bg-secondary/40">
+    <section id="servicios" className="pt-16 pb-8 sm:pt-20 sm:pb-10 px-6 bg-secondary/40">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-16 text-center">
+        <div className="mb-10 text-center">
           <Reveal className="flex flex-col items-center">
             <SectionLabel id="leistungen">Leistungen</SectionLabel>
             <h2 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={content.heading} /></h2>
@@ -822,17 +822,17 @@ export function Servicios({ content, images, spezialImages, positions, spezialPo
           </Reveal>
         </div>
 
-        <div className="mb-16">
+        <div className="mb-10">
           <ServiceCards services={content.services} images={images} positions={positions} />
         </div>
 
-        <div className="mb-16">
+        <div className="mt-24 mb-10">
           <Reveal className="mb-10 flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-amber-warm font-medium mb-3">
               <span className="w-8 h-px bg-amber-warm" />
               Spezialgebiete
             </div>
-            <h3 className="text-2xl sm:text-4xl font-display font-bold"><Highlight text={content.spezialHeading || "Beratung, die über Marketing hinausgeht."} /></h3>
+            <h3 className="text-4xl sm:text-6xl font-display font-bold"><Highlight text={content.spezialHeading || "Beratung, die über Marketing hinausgeht."} /></h3>
             {content.spezialText && (
               <p className="mt-4 text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto whitespace-pre-line">
                 <Highlight text={content.spezialText} />
@@ -914,7 +914,7 @@ export function KiSoftware({ content }: { content?: SiteContent["kiContent"] }) 
   const vidRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   return (
-    <section id="ki-software" className="py-32 px-6 bg-background overflow-hidden">
+    <section id="ki-software" className="py-16 sm:py-20 px-6 bg-background overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <Reveal className="text-center mb-14">
           <SectionLabel id="ki">KI & Software</SectionLabel>
@@ -965,7 +965,7 @@ export function KiSoftware({ content }: { content?: SiteContent["kiContent"] }) 
 /* ---------- BRANDING ---------- */
 export function Branding({ content }: { content: SiteContent["branding"] }) {
   return (
-    <section id="branding" className="py-32 px-6 bg-cream relative overflow-hidden">
+    <section id="branding" className="pt-10 pb-16 sm:pt-12 sm:pb-20 px-6 bg-cream relative overflow-hidden">
       <div className="relative max-w-5xl mx-auto text-center">
         <Reveal>
           <SectionLabel id="branding">Branding</SectionLabel>
@@ -1007,7 +1007,7 @@ export function Clientes({ heading, text }: { heading?: string; text?: string })
   ];
   const row = [...brands, ...brands, ...brands];
   return (
-    <section id="clientes" className="py-32 overflow-hidden">
+    <section id="clientes" className="py-16 sm:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 mb-12">
         <Reveal>
           <SectionLabel id="clientes">Kunden, Partner & Referenzen</SectionLabel>
@@ -1043,7 +1043,7 @@ export function Clientes({ heading, text }: { heading?: string; text?: string })
 /* ---------- KONTAKT CTA ---------- */
 export function KontaktCTA({ content }: { content?: SiteContent["kontaktCta"] }) {
   return (
-    <section className="relative py-28 px-6 overflow-hidden">
+    <section className="relative py-16 sm:py-20 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-amber-warm via-gold to-amber-warm animated-gradient" />
       <div className="relative max-w-4xl mx-auto text-center text-black">
         <Reveal>
@@ -1075,7 +1075,7 @@ export function KontaktCTA({ content }: { content?: SiteContent["kontaktCta"] })
 export function Contacto({ content, heading }: { content: SiteContent["contact"]; heading?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   return (
-    <section id="contacto" className="pt-44 pb-32 px-6 bg-secondary/40">
+    <section id="contacto" className="pt-32 pb-20 px-6 bg-secondary/40">
       <div className="max-w-6xl mx-auto">
         <SectionLabel id="kontakt">Kontakt</SectionLabel>
       </div>
